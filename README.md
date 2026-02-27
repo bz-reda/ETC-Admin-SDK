@@ -54,6 +54,26 @@ const file = document.getElementById("fileInput").files[0];
 await client.storage.upload("bucket-id", `uploads/${file.name}`, file);
 ```
 
+### Download a file
+
+```ts
+// Download file content (server-side)
+const file = await client.storage.download("bucket-id", "images/photo.jpg");
+
+// Save to disk (Node.js)
+import { writeFileSync } from "fs";
+writeFileSync("photo.jpg", Buffer.from(await file.arrayBuffer()));
+
+// Serve in an API route (Next.js)
+export async function GET(req: Request) {
+  const key = new URL(req.url).searchParams.get("key")!;
+  const file = await client.storage.download("bucket-id", key);
+  return new Response(file.body, {
+    headers: { "Content-Type": file.contentType },
+  });
+}
+```
+
 ### List files
 
 ```ts
@@ -73,16 +93,42 @@ if (result.is_truncated) {
 }
 ```
 
-### Get presigned URLs
+### Presigned URLs (best for frontend)
+
+Presigned URLs let browsers access private files directly — no proxy or API token needed.
 
 ```ts
-// Download URL (for serving private files)
-const { url } = await client.storage.getDownloadUrl("bucket-id", "reports/q4.pdf");
-// Use in <img src={url} /> or redirect to it
+// Download URL — use directly in <img>, <video>, or window.open()
+const { url } = await client.storage.getDownloadUrl("bucket-id", "images/photo.jpg");
+// url = "https://s3.espace-tech.com/...?X-Amz-Signature=..."
+// → Use in <img src={url} />, expires in 1 hour
 
-// Upload URL (for client-side uploads without exposing API token)
+// Upload URL — let browsers upload without your API token
 const { url: uploadUrl } = await client.storage.getUploadUrl("bucket-id", "uploads/photo.jpg");
 await fetch(uploadUrl, { method: "PUT", body: file });
+```
+
+**Serving images in Next.js (no proxy needed):**
+
+```ts
+// app/api/images/route.ts
+import { espace } from "@/lib/espace";
+
+export async function GET() {
+  const result = await espace.storage.listObjects("bucket-id", { prefix: "images/" });
+
+  const images = await Promise.all(
+    result.objects
+      .filter((obj) => !obj.is_folder)
+      .map(async (obj) => ({
+        key: obj.key,
+        url: (await espace.storage.getDownloadUrl("bucket-id", obj.key)).url,
+      }))
+  );
+
+  return Response.json({ images });
+}
+// Frontend: <img src={image.url} /> — works directly, no proxy route needed
 ```
 
 ### Delete a file
@@ -302,14 +348,16 @@ const client = new EspaceTech({
 ### Next.js (App Router)
 
 ```ts
-// lib/espace.ts
+// lib/espace.ts — shared client
 import { EspaceTech } from "@espace-tech/sdk";
 
 export const espace = new EspaceTech({
   apiToken: process.env.ESPACE_TECH_TOKEN!,
 });
+```
 
-// app/api/upload/route.ts
+```ts
+// app/api/upload/route.ts — handle file uploads
 import { espace } from "@/lib/espace";
 
 export async function POST(req: Request) {
@@ -318,6 +366,43 @@ export async function POST(req: Request) {
 
   const obj = await espace.storage.upload("bucket-id", `uploads/${file.name}`, file);
   return Response.json({ key: obj.key });
+}
+```
+
+```ts
+// app/api/images/route.ts — list images with browser-ready URLs
+import { espace } from "@/lib/espace";
+
+export async function GET() {
+  const result = await espace.storage.listObjects("bucket-id", { prefix: "images/" });
+
+  const images = await Promise.all(
+    result.objects
+      .filter((obj) => !obj.is_folder)
+      .map(async (obj) => ({
+        key: obj.key,
+        size: obj.size,
+        url: (await espace.storage.getDownloadUrl("bucket-id", obj.key)).url,
+      }))
+  );
+
+  return Response.json({ images });
+  // Frontend: <img src={image.url} /> — no proxy needed
+}
+```
+
+```ts
+// app/api/files/[key]/route.ts — download/serve a private file
+import { espace } from "@/lib/espace";
+
+export async function GET(_: Request, { params }: { params: { key: string } }) {
+  const file = await espace.storage.download("bucket-id", params.key);
+  return new Response(file.body, {
+    headers: {
+      "Content-Type": file.contentType,
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
 }
 ```
 
