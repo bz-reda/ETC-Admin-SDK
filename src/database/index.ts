@@ -82,10 +82,12 @@ export class DatabaseClient {
 
   /** Get raw database credentials */
   async getCredentials(databaseId: string): Promise<DatabaseCredentials> {
-    const res = await this.http.get<{ credentials: DatabaseCredentials }>(
+    const res = await this.http.get<Record<string, unknown>>(
       `/api/v1/databases/${databaseId}/credentials`,
     );
-    return res.credentials;
+    // Handle both { credentials: { ... } } and flat { host, port, ... } responses
+    const creds = (res.credentials || res) as DatabaseCredentials;
+    return creds;
   }
 
   /**
@@ -110,10 +112,10 @@ export class DatabaseClient {
    */
   async getConnection(databaseId: string): Promise<ConnectionConfig> {
     const creds = await this.getCredentials(databaseId);
-    const db = await this.get(databaseId);
 
-    let url = creds.connection_string;
-    if (!url) {
+    let url = creds.connection_string || "";
+    if (!url && creds.host) {
+      const db = await this.get(databaseId);
       const h = creds.host;
       const p = creds.port;
       if (db.engine === "postgresql") {
@@ -128,12 +130,12 @@ export class DatabaseClient {
     }
 
     return {
-      url: url || "",
-      host: creds.host,
-      port: creds.port,
-      username: creds.username,
-      password: creds.password,
-      database: creds.database,
+      url,
+      host: creds.host || "",
+      port: creds.port || 0,
+      username: creds.username || "",
+      password: creds.password || "",
+      database: creds.database || "",
     };
   }
 
