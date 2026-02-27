@@ -3,6 +3,7 @@ import type {
   Bucket,
   BucketCredentials,
   CreateBucketOptions,
+  DownloadResult,
   ListObjectsOptions,
   ListObjectsResult,
   PresignedUrl,
@@ -14,6 +15,7 @@ export type {
   Bucket,
   BucketCredentials,
   CreateBucketOptions,
+  DownloadResult,
   ListObjectsOptions,
   ListObjectsResult,
   PresignedUrl,
@@ -213,6 +215,45 @@ export class StorageClient {
     await this.http.request("DELETE", `/api/v1/storage/${bucketId}/objects`, {
       body: { key },
     });
+  }
+
+  /**
+   * Download a file from a bucket.
+   *
+   * @example
+   * ```ts
+   * // Next.js API route — serve a private image
+   * import { espace } from "@/lib/espace";
+   *
+   * export async function GET(req: Request) {
+   *   const key = new URL(req.url).searchParams.get("key")!;
+   *   const file = await espace.storage.download("bucket-id", key);
+   *   return new Response(file.body, {
+   *     headers: {
+   *       "Content-Type": file.contentType,
+   *       "Cache-Control": "public, max-age=3600",
+   *     },
+   *   });
+   * }
+   *
+   * // Node.js — save to disk
+   * import { writeFileSync } from "fs";
+   * const file = await client.storage.download("bucket-id", "report.pdf");
+   * writeFileSync("report.pdf", Buffer.from(await file.arrayBuffer()));
+   * ```
+   */
+  async download(bucketId: string, key: string): Promise<DownloadResult> {
+    const res = await this.http.rawFetch(
+      `/api/v1/storage/${bucketId}/objects/download?key=${encodeURIComponent(key)}`
+    );
+
+    return {
+      body: res.body,
+      arrayBuffer: () => res.arrayBuffer(),
+      blob: () => res.blob(),
+      contentType: res.headers.get("Content-Type") || "application/octet-stream",
+      size: parseInt(res.headers.get("Content-Length") || "0", 10),
+    };
   }
 
   // ── Presigned URLs ─────────────────────────────────────────

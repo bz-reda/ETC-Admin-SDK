@@ -61,6 +61,7 @@ export type {
   Bucket,
   BucketCredentials,
   CreateBucketOptions,
+  DownloadResult,
   ListObjectsOptions,
   ListObjectsResult,
   PresignedUrl,

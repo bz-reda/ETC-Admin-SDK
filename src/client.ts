@@ -174,6 +174,33 @@ export class HttpClient {
     return this.request<T>("POST", path, { formData, timeout });
   }
 
+  /** Raw fetch with auth headers — for streaming responses (downloads) */
+  async rawFetch(path: string, options?: { timeout?: number }): Promise<Response> {
+    const url = `${this.baseUrl}${path}`;
+    const timeout = options?.timeout ?? 300_000;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${this.apiToken}` },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      let errMsg = `Request failed with status ${res.status}`;
+      try {
+        const cloned = res.clone();
+        const data = (await cloned.json()) as { error?: string };
+        if (data.error) errMsg = data.error;
+      } catch { /* not JSON */ }
+      throw new EspaceError(errMsg, res.status, `HTTP_${res.status}`);
+    }
+
+    return res;
+  }
+
   private backoff(attempt: number): Promise<void> {
     const ms = Math.min(1000 * 2 ** attempt, 10_000) + Math.random() * 500;
     return new Promise((resolve) => setTimeout(resolve, ms));

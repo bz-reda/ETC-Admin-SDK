@@ -71,3 +71,17 @@ export interface UploadOptions {
   /** Upload timeout in ms (default: 5 minutes) */
   timeout?: number;
 }
+
+/** Result of downloading an object */
+export interface DownloadResult {
+  /** Raw response body stream */
+  body: ReadableStream<Uint8Array> | null;
+  /** Get full content as ArrayBuffer */
+  arrayBuffer: () => Promise<ArrayBuffer>;
+  /** Get full content as Blob */
+  blob: () => Promise<Blob>;
+  /** MIME type of the file */
+  contentType: string;
+  /** File size in bytes (0 if unknown) */
+  size: number;
+}
