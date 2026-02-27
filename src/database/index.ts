@@ -40,19 +40,26 @@ export class DatabaseClient {
 
   /** Create a new database */
   async create(options: CreateDatabaseOptions): Promise<Database> {
-    const res = await this.http.post<{ database: Database }>("/api/v1/databases", options);
+    const res = await this.http.post<{ database: Database }>(
+      "/api/v1/databases",
+      options,
+    );
     return res.database;
   }
 
   /** List all databases */
   async list(): Promise<Database[]> {
-    const res = await this.http.get<{ databases: Database[] }>("/api/v1/databases");
+    const res = await this.http.get<{ databases: Database[] }>(
+      "/api/v1/databases",
+    );
     return res.databases || [];
   }
 
   /** Get database details */
   async get(databaseId: string): Promise<Database> {
-    const res = await this.http.get<{ database: Database }>(`/api/v1/databases/${databaseId}`);
+    const res = await this.http.get<{ database: Database }>(
+      `/api/v1/databases/${databaseId}`,
+    );
     return res.database;
   }
 
@@ -76,7 +83,7 @@ export class DatabaseClient {
   /** Get raw database credentials */
   async getCredentials(databaseId: string): Promise<DatabaseCredentials> {
     const res = await this.http.get<{ credentials: DatabaseCredentials }>(
-      `/api/v1/databases/${databaseId}/credentials`
+      `/api/v1/databases/${databaseId}/credentials`,
     );
     return res.credentials;
   }
@@ -103,8 +110,25 @@ export class DatabaseClient {
    */
   async getConnection(databaseId: string): Promise<ConnectionConfig> {
     const creds = await this.getCredentials(databaseId);
+    const db = await this.get(databaseId);
+
+    let url = creds.connection_string;
+    if (!url) {
+      const h = creds.host;
+      const p = creds.port;
+      if (db.engine === "postgresql") {
+        url = `postgresql://${creds.username}:${creds.password}@${h}:${p}/${creds.database}`;
+      } else if (db.engine === "mongodb") {
+        url = `mongodb://${creds.username}:${creds.password}@${h}:${p}/${creds.database}?authSource=admin`;
+      } else if (db.engine === "redis") {
+        url = creds.password
+          ? `redis://:${creds.password}@${h}:${p}`
+          : `redis://${h}:${p}`;
+      }
+    }
+
     return {
-      url: creds.connection_string,
+      url: url || "",
       host: creds.host,
       port: creds.port,
       username: creds.username,
@@ -116,7 +140,7 @@ export class DatabaseClient {
   /** Rotate database password (invalidates existing connections) */
   async rotateCredentials(databaseId: string): Promise<DatabaseCredentials> {
     const res = await this.http.post<{ credentials: DatabaseCredentials }>(
-      `/api/v1/databases/${databaseId}/rotate`
+      `/api/v1/databases/${databaseId}/rotate`,
     );
     return res.credentials;
   }
@@ -151,7 +175,9 @@ export class DatabaseClient {
 
   /** Get live database metrics (connections, size, performance) */
   async getMetrics(databaseId: string): Promise<DatabaseMetrics> {
-    return this.http.get<DatabaseMetrics>(`/api/v1/databases/${databaseId}/metrics`);
+    return this.http.get<DatabaseMetrics>(
+      `/api/v1/databases/${databaseId}/metrics`,
+    );
   }
 
   // ── Backups ────────────────────────────────────────────────
@@ -159,7 +185,7 @@ export class DatabaseClient {
   /** Create a manual backup */
   async createBackup(databaseId: string): Promise<DatabaseBackup> {
     const res = await this.http.post<{ backup: DatabaseBackup }>(
-      `/api/v1/databases/${databaseId}/backups`
+      `/api/v1/databases/${databaseId}/backups`,
     );
     return res.backup;
   }
@@ -167,18 +193,22 @@ export class DatabaseClient {
   /** List backups for a database */
   async listBackups(databaseId: string): Promise<DatabaseBackup[]> {
     const res = await this.http.get<{ backups: DatabaseBackup[] }>(
-      `/api/v1/databases/${databaseId}/backups`
+      `/api/v1/databases/${databaseId}/backups`,
     );
     return res.backups || [];
   }
 
   /** Restore from a backup */
   async restoreBackup(databaseId: string, backupId: string): Promise<void> {
-    await this.http.post(`/api/v1/databases/${databaseId}/backups/${backupId}/restore`);
+    await this.http.post(
+      `/api/v1/databases/${databaseId}/backups/${backupId}/restore`,
+    );
   }
 
   /** Delete a backup */
   async deleteBackup(databaseId: string, backupId: string): Promise<void> {
-    await this.http.delete(`/api/v1/databases/${databaseId}/backups/${backupId}`);
+    await this.http.delete(
+      `/api/v1/databases/${databaseId}/backups/${backupId}`,
+    );
   }
 }
