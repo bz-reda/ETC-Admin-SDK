@@ -1,12 +1,29 @@
 # @espace-tech/sdk
 
-Official TypeScript SDK for [Espace-Tech Cloud](https://cloud.espace-tech.com) — storage, authentication, and database management.
+Official TypeScript SDK for [Espace-Tech Cloud](https://cloud.espace-tech.com) — storage, authentication, and database management for the Algerian and African developer ecosystem.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4%2B-blue.svg)](https://typescriptlang.org)
 
 ## Installation
 
 ```bash
-npm install @espace-tech/sdk
+# Install from GitHub
+npm install github:bz-reda/Espace-Tech-Cloud-SDK
+
+# Or with yarn
+yarn add github:bz-reda/Espace-Tech-Cloud-SDK
+
+# Or with pnpm
+pnpm add github:bz-reda/Espace-Tech-Cloud-SDK
 ```
+
+## Prerequisites
+
+1. Create an account at [cloud.espace-tech.com](https://cloud.espace-tech.com)
+2. Generate an API token at **Settings → API Tokens**
+3. Node.js 18 or higher (uses native `fetch`)
 
 ## Quick Start
 
@@ -14,7 +31,7 @@ npm install @espace-tech/sdk
 import { EspaceTech } from "@espace-tech/sdk";
 
 const client = new EspaceTech({
-  apiToken: "et_your_api_token", // Get from cloud.espace-tech.com/settings/tokens
+  apiToken: process.env.ESPACE_TECH_TOKEN!, // Get from cloud.espace-tech.com/settings/tokens
 });
 ```
 
@@ -64,8 +81,8 @@ const { url } = await client.storage.getDownloadUrl("bucket-id", "reports/q4.pdf
 // Use in <img src={url} /> or redirect to it
 
 // Upload URL (for client-side uploads without exposing API token)
-const { url } = await client.storage.getUploadUrl("bucket-id", "uploads/photo.jpg");
-await fetch(url, { method: "PUT", body: file });
+const { url: uploadUrl } = await client.storage.getUploadUrl("bucket-id", "uploads/photo.jpg");
+await fetch(uploadUrl, { method: "PUT", body: file });
 ```
 
 ### Delete a file
@@ -265,10 +282,107 @@ import { AuthClient } from "@espace-tech/sdk/auth";
 import { DatabaseClient } from "@espace-tech/sdk/database";
 ```
 
-## Requirements
+## Environment Variables
 
-- Node.js 18+ (uses native `fetch`)
-- Works in Node.js, Deno, Bun, Cloudflare Workers, and browsers
+We recommend storing your API token in environment variables:
+
+```bash
+# .env
+ESPACE_TECH_TOKEN=et_your_api_token
+```
+
+```ts
+const client = new EspaceTech({
+  apiToken: process.env.ESPACE_TECH_TOKEN!,
+});
+```
+
+## Framework Examples
+
+### Next.js (App Router)
+
+```ts
+// lib/espace.ts
+import { EspaceTech } from "@espace-tech/sdk";
+
+export const espace = new EspaceTech({
+  apiToken: process.env.ESPACE_TECH_TOKEN!,
+});
+
+// app/api/upload/route.ts
+import { espace } from "@/lib/espace";
+
+export async function POST(req: Request) {
+  const formData = await req.formData();
+  const file = formData.get("file") as File;
+
+  const obj = await espace.storage.upload("bucket-id", `uploads/${file.name}`, file);
+  return Response.json({ key: obj.key });
+}
+```
+
+### Express.js (Auth Middleware)
+
+```ts
+import express from "express";
+import { EspaceTech } from "@espace-tech/sdk";
+
+const client = new EspaceTech({ apiToken: process.env.ESPACE_TECH_TOKEN! });
+const app = express();
+
+// Protect routes with Espace-Tech Auth
+app.use("/api", async (req, res, next) => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const user = await client.auth.verifyToken("auth-app-id", token);
+    if (!user.valid) return res.status(401).json({ error: "Invalid token" });
+    req.user = user;
+    next();
+  } catch {
+    res.status(401).json({ error: "Auth failed" });
+  }
+});
+```
+
+## Compatibility
+
+- **Node.js** 18+ (uses native `fetch`)
+- **Deno**
+- **Bun**
+- **Cloudflare Workers**
+- **Browsers** (for client-side uploads via presigned URLs)
+
+## Development
+
+```bash
+# Clone the repo
+git clone https://github.com/bz-reda/Espace-Tech-Cloud-SDK.git
+cd Espace-Tech-Cloud-SDK
+
+# Install dependencies
+npm install
+
+# Build (ESM + CJS + TypeScript declarations)
+npm run build
+
+# Type check
+npm run typecheck
+
+# Watch mode during development
+npm run dev
+```
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/bz-reda/Espace-Tech-Cloud-SDK).
+
+## Links
+
+- [Espace-Tech Cloud Dashboard](https://cloud.espace-tech.com)
+- [GitHub Repository](https://github.com/bz-reda/Espace-Tech-Cloud-SDK)
+- [Report an Issue](https://github.com/bz-reda/Espace-Tech-Cloud-SDK/issues)
 
 ## License
 
