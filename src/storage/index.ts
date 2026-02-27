@@ -274,10 +274,15 @@ export class StorageClient {
     key: string,
     contentType?: string
   ): Promise<PresignedUrl> {
-    return this.http.post<PresignedUrl>(`/api/v1/storage/${bucketId}/presign/upload`, {
+    const res = await this.http.post<Record<string, unknown>>(
+      `/api/v1/storage/${bucketId}/presign/upload`,
+      { key, content_type: contentType },
+    );
+    return {
+      url: (res.upload_url || res.url) as string,
       key,
-      content_type: contentType,
-    });
+      expires_in: (res.expires_in as number) || 3600,
+    };
   }
 
   /**
@@ -291,8 +296,14 @@ export class StorageClient {
    * ```
    */
   async getDownloadUrl(bucketId: string, key: string): Promise<PresignedUrl> {
-    return this.http.post<PresignedUrl>(`/api/v1/storage/${bucketId}/presign/download`, {
+    const res = await this.http.post<Record<string, unknown>>(
+      `/api/v1/storage/${bucketId}/presign/download`,
+      { key },
+    );
+    return {
+      url: (res.download_url || res.url) as string,
       key,
-    });
+      expires_in: (res.expires_in as number) || 3600,
+    };
   }
 }

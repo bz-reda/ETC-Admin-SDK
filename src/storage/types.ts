@@ -52,9 +52,12 @@ export interface ListObjectsOptions {
 
 /** Presigned URL response */
 export interface PresignedUrl {
+  /** The presigned URL — use directly in browser */
   url: string;
+  /** Object key this URL is for */
   key: string;
-  expires_at: string;
+  /** Seconds until the URL expires (default: 3600) */
+  expires_in: number;
 }
 
 /** Options for creating a bucket */
