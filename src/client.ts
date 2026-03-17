@@ -47,7 +47,9 @@ export class HttpClient {
       throw new Error("@espace-tech/sdk: apiToken is required. Get one at cloud.espace-tech.com/settings/tokens");
     }
     this.apiToken = config.apiToken;
-    this.baseUrl = (config.baseUrl || "https://api.espace-tech.com").replace(/\/$/, "");
+    let envUrl: string | undefined;
+    try { envUrl = (globalThis as any).process?.env?.ESPACE_API_URL; } catch { /* browser */ }
+    this.baseUrl = (config.baseUrl || envUrl || "https://api.espace-tech.com").replace(/\/$/, "");
     this.timeout = config.timeout ?? 30_000;
     this.maxRetries = config.maxRetries ?? 2;
   }
