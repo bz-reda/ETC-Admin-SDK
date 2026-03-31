@@ -10,13 +10,13 @@ Official TypeScript SDK for [Espace-Tech Cloud](https://cloud.espace-tech.com) â
 
 ```bash
 # Install from GitHub
-npm install github:bz-reda/Espace-Tech-Cloud-SDK
+npm install github:bz-reda/ETC-Admin-SDK
 
 # Or with yarn
-yarn add github:bz-reda/Espace-Tech-Cloud-SDK
+yarn add github:bz-reda/ETC-Admin-SDK
 
 # Or with pnpm
-pnpm add github:bz-reda/Espace-Tech-Cloud-SDK
+pnpm add github:bz-reda/ETC-Admin-SDK
 ```
 
 ## Prerequisites
@@ -443,8 +443,8 @@ app.use("/api", async (req, res, next) => {
 
 ```bash
 # Clone the repo
-git clone https://github.com/bz-reda/Espace-Tech-Cloud-SDK.git
-cd Espace-Tech-Cloud-SDK
+git clone https://github.com/bz-reda/ETC-Admin-SDK.git
+cd ETC-Admin-SDK
 
 # Install dependencies
 npm install
@@ -461,13 +461,13 @@ npm run dev
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/bz-reda/Espace-Tech-Cloud-SDK).
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/bz-reda/ETC-Admin-SDK).
 
 ## Links
 
 - [Espace-Tech Cloud Dashboard](https://cloud.espace-tech.com)
-- [GitHub Repository](https://github.com/bz-reda/Espace-Tech-Cloud-SDK)
-- [Report an Issue](https://github.com/bz-reda/Espace-Tech-Cloud-SDK/issues)
+- [GitHub Repository](https://github.com/bz-reda/ETC-Admin-SDK)
+- [Report an Issue](https://github.com/bz-reda/ETC-Admin-SDK/issues)
 
 ## License
 

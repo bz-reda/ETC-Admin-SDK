@@ -19,7 +19,7 @@ A complete example showing how to display images from Espace-Tech Storage in a N
 
 1. Install the SDK:
    ```bash
-   npm install github:bz-reda/Espace-Tech-Cloud-SDK
+   npm install github:bz-reda/ETC-Admin-SDK
    ```
 
 2. Add environment variables to `.env.local`:
