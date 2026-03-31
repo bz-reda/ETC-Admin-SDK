@@ -137,6 +137,16 @@ export async function GET() {
 await client.storage.deleteObject("bucket-id", "images/old-photo.jpg");
 ```
 
+### List all files recursively
+
+```ts
+// Traverses all pages automatically
+const allFiles = await client.storage.listAllObjects("bucket-id", "images/");
+for (const obj of allFiles) {
+  console.log(obj.key, obj.size);
+}
+```
+
 ### Manage buckets
 
 ```ts
@@ -146,13 +156,25 @@ const bucket = await client.storage.createBucket({
   project_id: "project-id",
 });
 
+// Get bucket details
+const info = await client.storage.getBucket("bucket-id");
+
+// List all buckets
+const buckets = await client.storage.listBuckets();
+
 // Get S3 credentials (for direct S3 client access)
 const creds = await client.storage.getCredentials("bucket-id");
 console.log(creds.endpoint, creds.access_key_id);
 
+// Rotate credentials
+const newCreds = await client.storage.rotateCredentials("bucket-id");
+
 // Make public/private
 await client.storage.makePublic("bucket-id");
 await client.storage.makePrivate("bucket-id");
+
+// Delete bucket
+await client.storage.deleteBucket("bucket-id");
 ```
 
 ---
@@ -208,9 +230,27 @@ const app = await client.auth.createApp({
   providers: { email: true, google: true, github: true },
 });
 
+// List all auth apps
+const apps = await client.auth.listApps();
+
+// Get auth app details
+const appInfo = await client.auth.getApp("auth-app-id");
+
+// Update settings
+await client.auth.updateApp("auth-app-id", {
+  name: "Updated Name",
+  providers: { email: true, google: true, github: false },
+});
+
 // Get statistics
 const stats = await client.auth.getStats("auth-app-id");
 console.log(stats.total_users, stats.logins_today);
+
+// Rotate signing keys (invalidates all existing user tokens)
+await client.auth.rotateKeys("auth-app-id");
+
+// Delete auth app
+await client.auth.deleteApp("auth-app-id");
 ```
 
 ---
@@ -255,19 +295,34 @@ const db = await client.database.create({
 // List all databases
 const databases = await client.database.list();
 
+// Get database details
+const db = await client.database.get("db-id");
+
+// Get raw credentials
+const creds = await client.database.getCredentials("db-id");
+console.log(creds.host, creds.port, creds.username, creds.password);
+
+// Rotate credentials
+const newCreds = await client.database.rotateCredentials("db-id");
+
 // Stop / start
 await client.database.stop("db-id");
 await client.database.start("db-id");
 
-// Enable external access
+// Enable / disable external access
 await client.database.expose("db-id");
+await client.database.unexpose("db-id");
 
-// Link to a project (injects DATABASE_URL env var)
+// Link / unlink to a project (injects DATABASE_URL env var)
 await client.database.link("db-id", "project-id");
+await client.database.unlink("db-id");
 
 // Get live metrics
 const metrics = await client.database.getMetrics("db-id");
 console.log(metrics.connections, metrics.size);
+
+// Delete database
+await client.database.delete("db-id");
 ```
 
 ### Backups
@@ -281,6 +336,9 @@ const backups = await client.database.listBackups("db-id");
 
 // Restore from backup
 await client.database.restoreBackup("db-id", "backup-id");
+
+// Delete a backup
+await client.database.deleteBackup("db-id", "backup-id");
 ```
 
 ---
