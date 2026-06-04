@@ -130,12 +130,13 @@ export class DatabaseClient {
     };
   }
 
-  /** Rotate database password (invalidates existing connections) */
+  /** Rotate database password (invalidates existing connections). */
   async rotateCredentials(databaseId: string): Promise<DatabaseCredentials> {
-    const res = await this.http.post<{ credentials: DatabaseCredentials }>(
-      `/api/v1/databases/${databaseId}/rotate`,
-    );
-    return res.credentials;
+    // The backend rotate returns only { message, new_password }; re-read the
+    // full credentials (the secret now holds the rotated password) so callers
+    // get a complete, ready-to-use object.
+    await this.http.post(`/api/v1/databases/${databaseId}/rotate`);
+    return this.getCredentials(databaseId);
   }
 
   // ── External Access ────────────────────────────────────────
