@@ -21,17 +21,21 @@ export interface Database {
   updated_at: string;
 }
 
-/** Database connection credentials */
+/** Database connection credentials (matches GET /databases/:id/credentials). */
 export interface DatabaseCredentials {
+  type: DatabaseType;
   host: string;
   port: number;
   username: string;
   password: string;
   database: string;
-  connection_string: string;
-  internal_host?: string;
-  internal_port?: number;
-  internal_connection_string?: string;
+  /** In-cluster connection string — always present. */
+  internal_url: string;
+  external_access: boolean;
+  /** Present only when external access is enabled. */
+  external_host?: string;
+  external_port?: number;
+  external_url?: string;
 }
 
 /** Database metrics */
