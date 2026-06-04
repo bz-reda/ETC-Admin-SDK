@@ -7,6 +7,7 @@ import type {
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,
+  DatabaseType,
 } from "./types.js";
 
 export type {
@@ -17,6 +18,7 @@ export type {
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,
+  DatabaseType,
 };
 
 /**

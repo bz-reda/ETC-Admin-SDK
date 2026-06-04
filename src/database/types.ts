@@ -1,6 +1,9 @@
 /** Supported database engines */
 export type DatabaseEngine = "postgresql" | "redis" | "mongodb";
 
+/** Database type slug, matching the backend's `type` field (create + responses). */
+export type DatabaseType = "postgres" | "redis" | "mongodb";
+
 /** Database instance */
 export interface Database {
   id: string;
@@ -74,7 +77,8 @@ export interface DatabaseBackup {
 export interface CreateDatabaseOptions {
   name: string;
   project_id: string;
-  engine: DatabaseEngine;
+  /** Backend field is `type` with slugs postgres | redis | mongodb. */
+  type: DatabaseType;
   version?: string;
 }
 

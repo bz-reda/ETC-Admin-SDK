@@ -86,4 +86,5 @@ export type {
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,
+  DatabaseType,
 } from "./database/index.js";
