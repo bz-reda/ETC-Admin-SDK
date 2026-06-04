@@ -115,26 +115,15 @@ export class DatabaseClient {
   async getConnection(databaseId: string): Promise<ConnectionConfig> {
     const creds = await this.getCredentials(databaseId);
 
-    let url = creds.connection_string || "";
-    if (!url && creds.host) {
-      const db = await this.get(databaseId);
-      const h = creds.host;
-      const p = creds.port;
-      if (db.engine === "postgresql") {
-        url = `postgresql://${creds.username}:${creds.password}@${h}:${p}/${creds.database}`;
-      } else if (db.engine === "mongodb") {
-        url = `mongodb://${creds.username}:${creds.password}@${h}:${p}/${creds.database}?authSource=admin`;
-      } else if (db.engine === "redis") {
-        url = creds.password
-          ? `redis://:${creds.password}@${h}:${p}`
-          : `redis://${h}:${p}`;
-      }
-    }
-
+    // External access is opt-in; when it's enabled, return the externally-
+    // reachable URL/host/port so the connection works off-cluster. Otherwise
+    // use the in-cluster ones. The backend always provides internal_url, so the
+    // URL is never empty (the old manual fallback read a non-existent field).
+    const external = creds.external_access && !!creds.external_url;
     return {
-      url,
-      host: creds.host || "",
-      port: creds.port || 0,
+      url: (external ? creds.external_url : creds.internal_url) || "",
+      host: (external ? creds.external_host : creds.host) || "",
+      port: (external ? creds.external_port : creds.port) || 0,
       username: creds.username || "",
       password: creds.password || "",
       database: creds.database || "",
