@@ -138,16 +138,14 @@ export class AuthClient {
 
   /** Disable a user (prevent login) */
   async disableUser(appId: string, userId: string): Promise<void> {
-    await this.http.post(`/api/v1/auth-apps/${appId}/users/${userId}`, {
-      action: "disable",
-    });
+    // Backend route: POST /api/v1/auth-apps/:id/users/:userId/disable (no body).
+    await this.http.post(`/api/v1/auth-apps/${appId}/users/${userId}/disable`);
   }
 
   /** Enable a previously disabled user */
   async enableUser(appId: string, userId: string): Promise<void> {
-    await this.http.post(`/api/v1/auth-apps/${appId}/users/${userId}`, {
-      action: "enable",
-    });
+    // Backend route: POST /api/v1/auth-apps/:id/users/:userId/enable (no body).
+    await this.http.post(`/api/v1/auth-apps/${appId}/users/${userId}/enable`);
   }
 
   /** Delete a user from an auth app */
