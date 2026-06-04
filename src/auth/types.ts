@@ -44,17 +44,6 @@ export interface AuthStats {
   provider_breakdown: Record<string, number>;
 }
 
-/** Token verification result */
-export interface VerifiedToken {
-  valid: boolean;
-  user_id: string;
-  email: string;
-  name: string;
-  provider: string;
-  app_id: string;
-  expires_at: string;
-}
-
 /** Options for listing users */
 export interface ListUsersOptions {
   /** Page number (default: 1) */
