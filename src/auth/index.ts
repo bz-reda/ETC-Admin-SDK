@@ -4,7 +4,6 @@ import type {
   AuthStats,
   AuthUser,
   ListUsersOptions,
-  VerifiedToken,
 } from "./types.js";
 
 export type {
@@ -12,14 +11,14 @@ export type {
   AuthStats,
   AuthUser,
   ListUsersOptions,
-  VerifiedToken,
 };
 
 /**
  * Auth client for managing authentication apps (Firebase Auth alternative).
  *
- * Use this to verify user tokens in your backend, manage users,
- * and monitor auth app statistics.
+ * Use this to manage auth apps and their users, rotate keys, and monitor
+ * auth app statistics. End-user token verification is handled by the
+ * client-side Auth-SDK (@espace-tech/auth), not this server-side admin SDK.
  *
  * @example
  * ```ts
@@ -27,11 +26,8 @@ export type {
  *
  * const client = new EspaceTech({ apiToken: "et_..." });
  *
- * // Verify a user's token in your API middleware
- * const result = await client.auth.verifyToken("auth-app-id", userToken);
- * if (result.valid) {
- *   console.log("User:", result.email);
- * }
+ * // List the users of an auth app
+ * const { users } = await client.auth.listUsers("auth-app-id");
  * ```
  */
 export class AuthClient {
@@ -87,36 +83,6 @@ export class AuthClient {
   /** Get auth app statistics */
   async getStats(appId: string): Promise<AuthStats> {
     return this.http.get<AuthStats>(`/api/v1/auth-apps/${appId}/stats`);
-  }
-
-  // ── Token Verification ─────────────────────────────────────
-
-  /**
-   * Verify a user token from an auth app.
-   *
-   * Use this in your backend middleware to validate that a request
-   * is from an authenticated user.
-   *
-   * @param appId - Auth app ID
-   * @param token - User's JWT token (from login/OAuth callback)
-   *
-   * @example
-   * ```ts
-   * // Express.js middleware
-   * async function authMiddleware(req, res, next) {
-   *   const token = req.headers.authorization?.replace("Bearer ", "");
-   *   if (!token) return res.status(401).json({ error: "No token" });
-   *
-   *   const result = await client.auth.verifyToken("app-id", token);
-   *   if (!result.valid) return res.status(401).json({ error: "Invalid token" });
-   *
-   *   req.user = result;
-   *   next();
-   * }
-   * ```
-   */
-  async verifyToken(appId: string, token: string): Promise<VerifiedToken> {
-    return this.http.post<VerifiedToken>(`/api/v1/auth-apps/${appId}/verify`, { token });
   }
 
   // ── User Management ────────────────────────────────────────

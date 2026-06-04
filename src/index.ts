@@ -14,8 +14,8 @@
  * await client.storage.upload("bucket-id", "photo.jpg", file);
  * const { url } = await client.storage.getDownloadUrl("bucket-id", "photo.jpg");
  *
- * // Auth — verify user tokens in your backend
- * const user = await client.auth.verifyToken("app-id", token);
+ * // Auth — manage an auth app's users
+ * const { users } = await client.auth.listUsers("app-id");
  *
  * // Database — get connection strings
  * const conn = await client.database.getConnection("db-id");
@@ -75,7 +75,6 @@ export type {
   AuthStats,
   AuthUser,
   ListUsersOptions,
-  VerifiedToken,
 } from "./auth/index.js";
 
 export { DatabaseClient } from "./database/index.js";

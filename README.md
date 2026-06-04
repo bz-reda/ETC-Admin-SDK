@@ -181,26 +181,7 @@ await client.storage.deleteBucket("bucket-id");
 
 ## Auth
 
-Firebase Auth alternative — verify user tokens and manage users.
-
-### Verify a user token (backend middleware)
-
-```ts
-// Express.js example
-app.use(async (req, res, next) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
-  if (!token) return res.status(401).json({ error: "No token" });
-
-  try {
-    const result = await client.auth.verifyToken("auth-app-id", token);
-    if (!result.valid) return res.status(401).json({ error: "Invalid token" });
-    req.user = result; // { user_id, email, name, provider }
-    next();
-  } catch {
-    res.status(401).json({ error: "Token verification failed" });
-  }
-});
-```
+Firebase Auth alternative — manage auth apps and their users.
 
 ### List and manage users
 
@@ -462,31 +443,6 @@ export async function GET(_: Request, { params }: { params: { key: string } }) {
     },
   });
 }
-```
-
-### Express.js (Auth Middleware)
-
-```ts
-import express from "express";
-import { EspaceTech } from "@espace-tech/sdk";
-
-const client = new EspaceTech({ apiToken: process.env.ESPACE_TECH_TOKEN! });
-const app = express();
-
-// Protect routes with Espace-Tech Auth
-app.use("/api", async (req, res, next) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
-
-  try {
-    const user = await client.auth.verifyToken("auth-app-id", token);
-    if (!user.valid) return res.status(401).json({ error: "Invalid token" });
-    req.user = user;
-    next();
-  } catch {
-    res.status(401).json({ error: "Auth failed" });
-  }
-});
 ```
 
 ## Compatibility
