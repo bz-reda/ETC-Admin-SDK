@@ -18,7 +18,7 @@ export type {
  *
  * Use this to manage auth apps and their users, rotate keys, and monitor
  * auth app statistics. End-user token verification is handled by the
- * client-side Auth-SDK (@espace-tech/auth), not this server-side admin SDK.
+ * client-side Auth-SDK (@ghayma/auth), not this server-side admin SDK.
  *
  * @example
  * ```ts
