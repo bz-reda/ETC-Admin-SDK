@@ -1,6 +1,6 @@
-# @espace-tech/sdk
+# @ghayma/sdk
 
-Official TypeScript SDK for [Espace-Tech Cloud](https://cloud.espace-tech.com) — storage, authentication, and database management for the Algerian and African developer ecosystem.
+Official TypeScript SDK for [Ghayma](https://ghayma.tech) — storage, authentication, and database management for the Algerian and African developer ecosystem.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org)
@@ -21,17 +21,17 @@ pnpm add github:bz-reda/ETC-Admin-SDK
 
 ## Prerequisites
 
-1. Create an account at [cloud.espace-tech.com](https://cloud.espace-tech.com)
+1. Create an account at [app.ghayma.tech](https://app.ghayma.tech)
 2. Generate an API token at **Settings → API Tokens**
 3. Node.js 18 or higher (uses native `fetch`)
 
 ## Quick Start
 
 ```ts
-import { EspaceTech } from "@espace-tech/sdk";
+import { Ghayma } from "@ghayma/sdk";
 
-const client = new EspaceTech({
-  apiToken: process.env.ESPACE_TECH_TOKEN!, // Get from cloud.espace-tech.com/settings/tokens
+const client = new Ghayma({
+  apiToken: process.env.GHAYMA_TOKEN!, // Get from app.ghayma.tech/settings/tokens
 });
 ```
 
@@ -100,7 +100,7 @@ Presigned URLs let browsers access private files directly — no proxy or API to
 ```ts
 // Download URL — use directly in <img>, <video>, or window.open()
 const { url } = await client.storage.getDownloadUrl("bucket-id", "images/photo.jpg");
-// url = "https://s3.espace-tech.com/...?X-Amz-Signature=..."
+// url = "https://s3.ghayma.tech/...?X-Amz-Signature=..."
 // → Use in <img src={url} />, expires in 1 hour
 
 // Upload URL — let browsers upload without your API token
@@ -112,17 +112,17 @@ await fetch(uploadUrl, { method: "PUT", body: file });
 
 ```ts
 // app/api/images/route.ts
-import { espace } from "@/lib/espace";
+import { ghayma } from "@/lib/ghayma";
 
 export async function GET() {
-  const result = await espace.storage.listObjects("bucket-id", { prefix: "images/" });
+  const result = await ghayma.storage.listObjects("bucket-id", { prefix: "images/" });
 
   const images = await Promise.all(
     result.objects
       .filter((obj) => !obj.is_folder)
       .map(async (obj) => ({
         key: obj.key,
-        url: (await espace.storage.getDownloadUrl("bucket-id", obj.key)).url,
+        url: (await ghayma.storage.getDownloadUrl("bucket-id", obj.key)).url,
       }))
   );
 
@@ -326,15 +326,15 @@ await client.database.deleteBackup("db-id", "backup-id");
 
 ## Error Handling
 
-All methods throw `EspaceError` on failure:
+All methods throw `GhaymaError` on failure:
 
 ```ts
-import { EspaceError } from "@espace-tech/sdk";
+import { GhaymaError } from "@ghayma/sdk";
 
 try {
   await client.storage.upload("bucket-id", "file.txt", blob);
 } catch (err) {
-  if (err instanceof EspaceError) {
+  if (err instanceof GhaymaError) {
     console.error(err.message);  // "Bucket not found"
     console.error(err.status);   // 404
     console.error(err.code);     // "HTTP_404"
@@ -345,9 +345,9 @@ try {
 ## Configuration
 
 ```ts
-const client = new EspaceTech({
+const client = new Ghayma({
   apiToken: "et_...",                              // Required
-  baseUrl: "https://api.espace-tech.com",          // Default
+  baseUrl: "https://api.ghayma.tech",              // Default
   timeout: 30000,                                  // 30s default
   maxRetries: 2,                                   // Retries on 5xx errors
 });
@@ -359,12 +359,12 @@ Import only what you need:
 
 ```ts
 // Full SDK
-import { EspaceTech } from "@espace-tech/sdk";
+import { Ghayma } from "@ghayma/sdk";
 
 // Individual modules
-import { StorageClient } from "@espace-tech/sdk/storage";
-import { AuthClient } from "@espace-tech/sdk/auth";
-import { DatabaseClient } from "@espace-tech/sdk/database";
+import { StorageClient } from "@ghayma/sdk/storage";
+import { AuthClient } from "@ghayma/sdk/auth";
+import { DatabaseClient } from "@ghayma/sdk/database";
 ```
 
 ## Environment Variables
@@ -373,12 +373,12 @@ We recommend storing your API token in environment variables:
 
 ```bash
 # .env
-ESPACE_TECH_TOKEN=et_your_api_token
+GHAYMA_TOKEN=et_your_api_token
 ```
 
 ```ts
-const client = new EspaceTech({
-  apiToken: process.env.ESPACE_TECH_TOKEN!,
+const client = new Ghayma({
+  apiToken: process.env.GHAYMA_TOKEN!,
 });
 ```
 
@@ -387,33 +387,33 @@ const client = new EspaceTech({
 ### Next.js (App Router)
 
 ```ts
-// lib/espace.ts — shared client
-import { EspaceTech } from "@espace-tech/sdk";
+// lib/ghayma.ts — shared client
+import { Ghayma } from "@ghayma/sdk";
 
-export const espace = new EspaceTech({
-  apiToken: process.env.ESPACE_TECH_TOKEN!,
+export const ghayma = new Ghayma({
+  apiToken: process.env.GHAYMA_TOKEN!,
 });
 ```
 
 ```ts
 // app/api/upload/route.ts — handle file uploads
-import { espace } from "@/lib/espace";
+import { ghayma } from "@/lib/ghayma";
 
 export async function POST(req: Request) {
   const formData = await req.formData();
   const file = formData.get("file") as File;
 
-  const obj = await espace.storage.upload("bucket-id", `uploads/${file.name}`, file);
+  const obj = await ghayma.storage.upload("bucket-id", `uploads/${file.name}`, file);
   return Response.json({ key: obj.key });
 }
 ```
 
 ```ts
 // app/api/images/route.ts — list images with browser-ready URLs
-import { espace } from "@/lib/espace";
+import { ghayma } from "@/lib/ghayma";
 
 export async function GET() {
-  const result = await espace.storage.listObjects("bucket-id", { prefix: "images/" });
+  const result = await ghayma.storage.listObjects("bucket-id", { prefix: "images/" });
 
   const images = await Promise.all(
     result.objects
@@ -421,7 +421,7 @@ export async function GET() {
       .map(async (obj) => ({
         key: obj.key,
         size: obj.size,
-        url: (await espace.storage.getDownloadUrl("bucket-id", obj.key)).url,
+        url: (await ghayma.storage.getDownloadUrl("bucket-id", obj.key)).url,
       }))
   );
 
@@ -432,10 +432,10 @@ export async function GET() {
 
 ```ts
 // app/api/files/[key]/route.ts — download/serve a private file
-import { espace } from "@/lib/espace";
+import { ghayma } from "@/lib/ghayma";
 
 export async function GET(_: Request, { params }: { params: { key: string } }) {
-  const file = await espace.storage.download("bucket-id", params.key);
+  const file = await ghayma.storage.download("bucket-id", params.key);
   return new Response(file.body, {
     headers: {
       "Content-Type": file.contentType,
@@ -479,10 +479,11 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 
 ## Links
 
-- [Espace-Tech Cloud Dashboard](https://cloud.espace-tech.com)
+- [Ghayma Dashboard](https://app.ghayma.tech)
+- [Documentation](https://docs.ghayma.dev)
 - [GitHub Repository](https://github.com/bz-reda/ETC-Admin-SDK)
 - [Report an Issue](https://github.com/bz-reda/ETC-Admin-SDK/issues)
 
 ## License
 
-MIT © [Espace-Tech](https://espace-tech.com)
+MIT © [Ghayma](https://ghayma.tech)

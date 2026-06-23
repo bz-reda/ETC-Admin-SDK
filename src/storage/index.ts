@@ -28,9 +28,9 @@ export type {
  *
  * @example
  * ```ts
- * import { EspaceTech } from "@espace-tech/sdk";
+ * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new EspaceTech({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "et_..." });
  *
  * // Upload a file
  * await client.storage.upload("bucket-id", "images/photo.jpg", file);
@@ -223,11 +223,11 @@ export class StorageClient {
    * @example
    * ```ts
    * // Next.js API route — serve a private image
-   * import { espace } from "@/lib/espace";
+   * import { ghayma } from "@/lib/ghayma";
    *
    * export async function GET(req: Request) {
    *   const key = new URL(req.url).searchParams.get("key")!;
-   *   const file = await espace.storage.download("bucket-id", key);
+   *   const file = await ghayma.storage.download("bucket-id", key);
    *   return new Response(file.body, {
    *     headers: {
    *       "Content-Type": file.contentType,

@@ -1,8 +1,8 @@
 {
-  "name": "@bz-reda/ETC-Admin-SDK",
+  "name": "@ghayma/sdk",
   "version": "0.1.0",
-  "description": "Official SDK for Espace-Tech Cloud — storage, auth, and database helpers",
-  "author": "Espace-Tech <hello@espace-tech.com>",
+  "description": "Official SDK for Ghayma — storage, auth, and database helpers",
+  "author": "Ghayma <hello@ghayma.dev>",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -67,7 +67,7 @@
     "typescript": "^5.4.0"
   },
   "keywords": [
-    "espace-tech",
+    "ghayma",
     "cloud",
     "storage",
     "s3",
@@ -81,7 +81,7 @@
     "type": "git",
     "url": "https://github.com/bz-reda/ETC-Admin-SDK"
   },
-  "homepage": "https://cloud.espace-tech.com/docs",
+  "homepage": "https://docs.ghayma.dev",
   "engines": {
     "node": ">=18.0.0"
   }

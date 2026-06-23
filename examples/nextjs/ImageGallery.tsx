@@ -1,4 +1,4 @@
-// components/ImageGallery.tsx — displays images from Espace-Tech Storage
+// components/ImageGallery.tsx — displays images from Ghayma Storage
 "use client";
 
 import { useEffect, useState } from "react";

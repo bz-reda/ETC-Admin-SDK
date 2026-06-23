@@ -1,14 +1,14 @@
 /**
- * Espace-Tech Cloud SDK — Base HTTP Client
+ * Ghayma SDK — Base HTTP Client
  *
  * Handles authentication, request building, error handling,
  * and optional retries for all SDK modules.
  */
 
 export interface ClientConfig {
-  /** API token from cloud.espace-tech.com/settings/tokens */
+  /** API token from docs.ghayma.dev/settings/tokens */
   apiToken: string;
-  /** Base URL override (default: https://api.espace-tech.com) */
+  /** Base URL override (default: https://api.ghayma.tech) */
   baseUrl?: string;
   /** Request timeout in ms (default: 30000) */
   timeout?: number;
@@ -16,19 +16,22 @@ export interface ClientConfig {
   maxRetries?: number;
 }
 
-export class EspaceError extends Error {
+export class GhaymaError extends Error {
   public readonly status: number;
   public readonly code: string;
   public readonly details?: unknown;
 
   constructor(message: string, status: number, code: string, details?: unknown) {
     super(message);
-    this.name = "EspaceError";
+    this.name = "GhaymaError";
     this.status = status;
     this.code = code;
     this.details = details;
   }
 }
+
+/** @deprecated use GhaymaError */
+export { GhaymaError as EspaceError };
 
 interface ErrorResponse {
   error?: string;
@@ -44,12 +47,17 @@ export class HttpClient {
 
   constructor(config: ClientConfig) {
     if (!config.apiToken) {
-      throw new Error("@espace-tech/sdk: apiToken is required. Get one at cloud.espace-tech.com/settings/tokens");
+      throw new Error("@ghayma/sdk: apiToken is required. Get one at docs.ghayma.dev/settings/tokens");
     }
     this.apiToken = config.apiToken;
     let envUrl: string | undefined;
-    try { envUrl = (globalThis as any).process?.env?.ESPACE_API_URL; } catch { /* browser */ }
-    this.baseUrl = (config.baseUrl || envUrl || "https://api.espace-tech.com").replace(/\/$/, "");
+    // Dual-read: prefer GHAYMA_API_URL, fall back to legacy ESPACE_API_URL
+    // so existing deployments setting the old var keep working post-rebrand.
+    try {
+      const env = (globalThis as any).process?.env;
+      envUrl = env?.GHAYMA_API_URL ?? env?.ESPACE_API_URL;
+    } catch { /* browser */ }
+    this.baseUrl = (config.baseUrl || envUrl || "https://api.ghayma.tech").replace(/\/$/, "");
     this.timeout = config.timeout ?? 30_000;
     this.maxRetries = config.maxRetries ?? 2;
   }
@@ -118,7 +126,7 @@ export class HttpClient {
           // Response wasn't JSON
         }
 
-        const error = new EspaceError(
+        const error = new GhaymaError(
           errData.error || `Request failed with status ${res.status}`,
           res.status,
           errData.code || `HTTP_${res.status}`,
@@ -134,12 +142,12 @@ export class HttpClient {
 
         throw error;
       } catch (err) {
-        if (err instanceof EspaceError) throw err;
+        if (err instanceof GhaymaError) throw err;
 
         if (err instanceof DOMException && err.name === "AbortError") {
-          lastError = new EspaceError("Request timed out", 408, "TIMEOUT");
+          lastError = new GhaymaError("Request timed out", 408, "TIMEOUT");
         } else {
-          lastError = new EspaceError(
+          lastError = new GhaymaError(
             err instanceof Error ? err.message : "Network error",
             0,
             "NETWORK_ERROR"
@@ -153,7 +161,7 @@ export class HttpClient {
       }
     }
 
-    throw lastError || new EspaceError("Request failed", 0, "UNKNOWN");
+    throw lastError || new GhaymaError("Request failed", 0, "UNKNOWN");
   }
 
   async get<T>(path: string, query?: Record<string, string | number | boolean | undefined>): Promise<T> {
@@ -197,7 +205,7 @@ export class HttpClient {
         const data = (await cloned.json()) as { error?: string };
         if (data.error) errMsg = data.error;
       } catch { /* not JSON */ }
-      throw new EspaceError(errMsg, res.status, `HTTP_${res.status}`);
+      throw new GhaymaError(errMsg, res.status, `HTTP_${res.status}`);
     }
 
     return res;

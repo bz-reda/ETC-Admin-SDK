@@ -6,11 +6,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "s3.espace-tech.com",
+        hostname: "s3.ghayma.tech",
       },
       {
         protocol: "https",
-        hostname: "*.s3.espace-tech.com",
+        hostname: "*.s3.ghayma.tech",
       },
     ],
   },
