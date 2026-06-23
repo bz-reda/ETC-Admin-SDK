@@ -18,13 +18,13 @@ export type {
  *
  * Use this to manage auth apps and their users, rotate keys, and monitor
  * auth app statistics. End-user token verification is handled by the
- * client-side Auth-SDK (@espace-tech/auth), not this server-side admin SDK.
+ * client-side Auth-SDK (@ghayma/auth), not this server-side admin SDK.
  *
  * @example
  * ```ts
- * import { EspaceTech } from "@espace-tech/sdk";
+ * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new EspaceTech({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "et_..." });
  *
  * // List the users of an auth app
  * const { users } = await client.auth.listUsers("auth-app-id");

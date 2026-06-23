@@ -26,9 +26,9 @@ export type {
  *
  * @example
  * ```ts
- * import { EspaceTech } from "@espace-tech/sdk";
+ * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new EspaceTech({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "et_..." });
  *
  * // Get connection string for your app
  * const conn = await client.database.getConnection("db-id");

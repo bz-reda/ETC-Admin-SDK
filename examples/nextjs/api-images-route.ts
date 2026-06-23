@@ -1,14 +1,14 @@
 // app/api/images/route.ts — returns images with presigned URLs
-import { espace } from "@/lib/espace";
+import { ghayma } from "@/lib/ghayma";
 
-const BUCKET_ID = process.env.ESPACE_TECH_BUCKET_ID!;
+const BUCKET_ID = process.env.GHAYMA_BUCKET_ID!;
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const prefix = searchParams.get("prefix") || "images/";
 
   try {
-    const result = await espace.storage.listObjects(BUCKET_ID, { prefix });
+    const result = await ghayma.storage.listObjects(BUCKET_ID, { prefix });
 
     const images = await Promise.all(
       result.objects
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
           key: obj.key,
           name: obj.key.split("/").pop() || obj.key,
           size: obj.size,
-          url: (await espace.storage.getDownloadUrl(BUCKET_ID, obj.key)).url,
+          url: (await ghayma.storage.getDownloadUrl(BUCKET_ID, obj.key)).url,
         }))
     );
 

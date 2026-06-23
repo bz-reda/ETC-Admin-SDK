@@ -1,14 +1,14 @@
 /**
- * @espace-tech/sdk
+ * @ghayma/sdk
  *
- * Official SDK for Espace-Tech Cloud.
+ * Official SDK for Ghayma.
  * Manage storage, auth, and databases programmatically.
  *
  * @example
  * ```ts
- * import { EspaceTech } from "@espace-tech/sdk";
+ * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new EspaceTech({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "et_..." });
  *
  * // Storage
  * await client.storage.upload("bucket-id", "photo.jpg", file);
@@ -24,17 +24,17 @@
  * @packageDocumentation
  */
 
-import { HttpClient, type ClientConfig, EspaceError } from "./client.js";
+import { HttpClient, type ClientConfig } from "./client.js";
 import { StorageClient } from "./storage/index.js";
 import { AuthClient } from "./auth/index.js";
 import { DatabaseClient } from "./database/index.js";
 
 /**
- * Main Espace-Tech Cloud client.
+ * Main Ghayma client.
  *
- * Initialize with your API token from cloud.espace-tech.com/settings/tokens.
+ * Initialize with your API token from docs.ghayma.dev/settings/tokens.
  */
-export class EspaceTech {
+export class Ghayma {
   /** Storage — manage buckets, upload/download files, presigned URLs */
   public readonly storage: StorageClient;
   /** Auth — manage auth apps, verify user tokens, manage users */
@@ -52,7 +52,12 @@ export class EspaceTech {
   }
 }
 
+/** @deprecated use Ghayma */
+export { Ghayma as EspaceTech };
+
 // Re-export everything
+export { GhaymaError } from "./client.js";
+/** @deprecated use GhaymaError */
 export { EspaceError } from "./client.js";
 export type { ClientConfig } from "./client.js";
 
