@@ -19,7 +19,7 @@ A complete example showing how to display images from Ghayma Storage in a Next.j
 
 1. Install the SDK:
    ```bash
-   npm install github:bz-reda/ETC-Admin-SDK
+   npm install github:bz-reda/Ghayma-Admin-SDK
    ```
 
 2. Add environment variables to `.env.local`:

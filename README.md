@@ -10,13 +10,13 @@ Official TypeScript SDK for [Ghayma](https://ghayma.tech) — storage, authentic
 
 ```bash
 # Install from GitHub
-npm install github:bz-reda/ETC-Admin-SDK
+npm install github:bz-reda/Ghayma-Admin-SDK
 
 # Or with yarn
-yarn add github:bz-reda/ETC-Admin-SDK
+yarn add github:bz-reda/Ghayma-Admin-SDK
 
 # Or with pnpm
-pnpm add github:bz-reda/ETC-Admin-SDK
+pnpm add github:bz-reda/Ghayma-Admin-SDK
 ```
 
 ## Prerequisites
@@ -266,7 +266,7 @@ const redis = new Redis(conn.url);
 const db = await client.database.create({
   name: "my-postgres",
   project_id: "project-id",
-  engine: "postgresql",
+  type: "postgres",
 });
 ```
 
@@ -457,8 +457,8 @@ export async function GET(_: Request, { params }: { params: { key: string } }) {
 
 ```bash
 # Clone the repo
-git clone https://github.com/bz-reda/ETC-Admin-SDK.git
-cd ETC-Admin-SDK
+git clone https://github.com/bz-reda/Ghayma-Admin-SDK.git
+cd Ghayma-Admin-SDK
 
 # Install dependencies
 npm install
@@ -475,14 +475,14 @@ npm run dev
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/bz-reda/ETC-Admin-SDK).
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/bz-reda/Ghayma-Admin-SDK).
 
 ## Links
 
 - [Ghayma Dashboard](https://app.ghayma.tech)
 - [Documentation](https://docs.ghayma.dev)
-- [GitHub Repository](https://github.com/bz-reda/ETC-Admin-SDK)
-- [Report an Issue](https://github.com/bz-reda/ETC-Admin-SDK/issues)
+- [GitHub Repository](https://github.com/bz-reda/Ghayma-Admin-SDK)
+- [Report an Issue](https://github.com/bz-reda/Ghayma-Admin-SDK/issues)
 
 ## License
 

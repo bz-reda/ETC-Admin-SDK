@@ -26,8 +26,8 @@ src/
 │   ├── index.ts        # StorageClient (buckets, objects, presigned URLs, download)
 │   └── types.ts        # Bucket, StorageObject, PresignedUrl, etc.
 ├── auth/
-│   ├── index.ts        # AuthClient (auth apps, token verify, user management)
-│   └── types.ts        # AuthApp, AuthUser, VerifiedToken, etc.
+│   ├── index.ts        # AuthClient (auth apps, user management)
+│   └── types.ts        # AuthApp, AuthUser, etc.
 └── database/
     ├── index.ts        # DatabaseClient (CRUD, connections, metrics, backups)
     └── types.ts        # Database, DatabaseCredentials, DatabaseEngine, etc.
@@ -48,5 +48,5 @@ src/
 - `GhaymaError` carries structured info: `message`, `status`, `code`, `details`.
 - Retries use exponential backoff with jitter, only on 5xx or network errors.
 - `rawFetch` is used for streaming responses (file downloads) — separate from the JSON `request` method.
-- Environment variable `GHAYMA_API_URL` auto-overrides the base URL (for internal cluster routing); the legacy `ESPACE_API_URL` is still read as a fallback.
+- Environment variable `GHAYMA_API_URL` overrides the default base URL (for internal cluster routing) — an explicitly-passed `baseUrl` always wins; the legacy `ESPACE_API_URL` is still read as a fallback.
 - The SDK targets both browser and Node.js — uses `globalThis` and guards `process.env` access.
