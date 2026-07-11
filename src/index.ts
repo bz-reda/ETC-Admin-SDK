@@ -37,7 +37,7 @@ import { DatabaseClient } from "./database/index.js";
 export class Ghayma {
   /** Storage — manage buckets, upload/download files, presigned URLs */
   public readonly storage: StorageClient;
-  /** Auth — manage auth apps, verify user tokens, manage users */
+  /** Auth — manage auth apps and users */
   public readonly auth: AuthClient;
   /** Database — manage PostgreSQL/Redis/MongoDB, get connections */
   public readonly database: DatabaseClient;
