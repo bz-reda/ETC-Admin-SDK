@@ -480,7 +480,7 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 ## Links
 
 - [Ghayma Dashboard](https://app.ghayma.tech)
-- [Documentation](https://docs.ghayma.dev)
+- [Documentation](https://docs.ghayma.cloud)
 - [GitHub Repository](https://github.com/bz-reda/Ghayma-Admin-SDK)
 - [Report an Issue](https://github.com/bz-reda/Ghayma-Admin-SDK/issues)
 
