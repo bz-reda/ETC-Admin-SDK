@@ -26,6 +26,13 @@ export interface AuthUser {
   provider: "email" | "google" | "github";
   verified: boolean;
   disabled: boolean;
+  /**
+   * Developer-owned data (roles, plan, tenant id) — embedded in the user's
+   * JWT as the `app_metadata` claim. Written only via updateUserAppMetadata
+   * (requires the admin or owner role on the project); end users can read
+   * but never write it.
+   */
+  app_metadata: Record<string, unknown>;
   last_login: string | null;
   created_at: string;
 }

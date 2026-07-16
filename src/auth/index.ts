@@ -118,4 +118,22 @@ export class AuthClient {
   async deleteUser(appId: string, userId: string): Promise<void> {
     await this.http.delete(`/api/v1/auth-apps/${appId}/users/${userId}`);
   }
+
+  /**
+   * Replace a user's developer-owned app_metadata (roles, plan, tenant id).
+   * Requires the admin or owner role on the project; `{}` clears it.
+   * The new value reaches the user's JWT at their next token refresh.
+   *
+   * @example
+   * await client.auth.updateUserAppMetadata(appId, userId, { roles: ["admin"] });
+   */
+  async updateUserAppMetadata(
+    appId: string,
+    userId: string,
+    appMetadata: Record<string, unknown>
+  ): Promise<{ user: AuthUser }> {
+    return this.http.patch(`/api/v1/auth-apps/${appId}/users/${userId}/app-metadata`, {
+      app_metadata: appMetadata,
+    });
+  }
 }
