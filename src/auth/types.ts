@@ -9,6 +9,8 @@ export interface AuthApp {
   session_duration: number;
   created_at: string;
   updated_at: string;
+  /** Language of the end-user email templates: "en" | "fr" | "ar" */
+  email_locale?: string;
 }
 
 /** OAuth provider configuration */

@@ -64,6 +64,8 @@ export class AuthClient {
       name: string;
       providers: Partial<{ email: boolean; google: boolean; github: boolean }>;
       session_duration: number;
+      /** Language of the end-user email templates: "en" | "fr" | "ar" */
+      email_locale: string;
     }>
   ): Promise<AuthApp> {
     const res = await this.http.put<{ auth_app: AuthApp }>(`/api/v1/auth-apps/${appId}`, updates);
