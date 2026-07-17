@@ -1,6 +1,6 @@
 {
   "name": "@ghayma/sdk",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Official SDK for Ghayma — storage, auth, and database helpers",
   "author": "Ghayma <hello@ghayma.dev>",
   "license": "MIT",
