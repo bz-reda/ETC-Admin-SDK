@@ -122,6 +122,25 @@ export class AuthClient {
   }
 
   /**
+   * Mint a password-reset link for an end user (Firebase
+   * generatePasswordResetLink parity) — for apps that send their own
+   * reset emails. The link is a LIVE single-use credential (expires in
+   * 1 hour): send it to the user's verified email and nowhere else,
+   * never log it. Requires the admin or owner role; strictly
+   * rate-limited per app. Minting invalidates any pending reset token.
+   *
+   * @example
+   * const { link } = await client.auth.generatePasswordResetLink(appId, "user@example.com");
+   * // send `link` in your own email template
+   */
+  async generatePasswordResetLink(
+    appId: string,
+    email: string
+  ): Promise<{ link: string; expires_at: string }> {
+    return this.http.post(`/api/v1/auth-apps/${appId}/reset-link`, { email });
+  }
+
+  /**
    * Replace a user's developer-owned app_metadata (roles, plan, tenant id).
    * Requires the admin or owner role on the project; `{}` clears it.
    * The new value reaches the user's JWT at their next token refresh.
