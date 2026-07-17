@@ -122,6 +122,15 @@ export class AuthClient {
   }
 
   /**
+   * Clear an end user's 2FA enrolment (support hammer for a locked-out
+   * user — lost phone/authenticator). The user signs back in with their
+   * password and re-enrols. Requires the admin or owner role; audited.
+   */
+  async resetUser2FA(appId: string, userId: string): Promise<void> {
+    await this.http.post(`/api/v1/auth-apps/${appId}/users/${userId}/reset-2fa`);
+  }
+
+  /**
    * Mint a password-reset link for an end user (Firebase
    * generatePasswordResetLink parity) — for apps that send their own
    * reset emails. The link is a LIVE single-use credential (expires in

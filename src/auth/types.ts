@@ -35,6 +35,10 @@ export interface AuthUser {
    * but never write it.
    */
   app_metadata: Record<string, unknown>;
+  /** 2FA state (read-only) */
+  totp_enabled?: boolean;
+  whatsapp_otp_enabled?: boolean;
+  phone_verified?: boolean;
   last_login: string | null;
   created_at: string;
 }
