@@ -2,7 +2,7 @@
   "name": "@ghayma/sdk",
   "version": "0.4.0",
   "description": "Official SDK for Ghayma — storage, auth, and database helpers",
-  "author": "Ghayma <hello@ghayma.dev>",
+  "author": "Ghayma <hello@ghayma.cloud>",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -81,7 +81,7 @@
     "type": "git",
     "url": "https://github.com/bz-reda/Ghayma-Admin-SDK"
   },
-  "homepage": "https://docs.ghayma.dev",
+  "homepage": "https://docs.ghayma.cloud",
   "engines": {
     "node": ">=18.0.0"
   }

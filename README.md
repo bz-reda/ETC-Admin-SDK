@@ -1,6 +1,6 @@
 # @ghayma/sdk
 
-Official TypeScript SDK for [Ghayma](https://ghayma.tech) — storage, authentication, and database management for the Algerian and African developer ecosystem.
+Official TypeScript SDK for [Ghayma](https://ghayma.cloud) — storage, authentication, and database management for the Algerian and African developer ecosystem.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org)
@@ -21,7 +21,7 @@ pnpm add github:bz-reda/Ghayma-Admin-SDK
 
 ## Prerequisites
 
-1. Create an account at [app.ghayma.tech](https://app.ghayma.tech)
+1. Create an account at [dash.ghayma.cloud](https://dash.ghayma.cloud)
 2. Generate an API token at **Settings → API Tokens**
 3. Node.js 18 or higher (uses native `fetch`)
 
@@ -31,7 +31,7 @@ pnpm add github:bz-reda/Ghayma-Admin-SDK
 import { Ghayma } from "@ghayma/sdk";
 
 const client = new Ghayma({
-  apiToken: process.env.GHAYMA_TOKEN!, // Get from app.ghayma.tech/settings/tokens
+  apiToken: process.env.GHAYMA_TOKEN!, // Settings -> API Tokens on dash.ghayma.cloud
 });
 ```
 
@@ -485,11 +485,11 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 
 ## Links
 
-- [Ghayma Dashboard](https://app.ghayma.tech)
+- [Ghayma Dashboard](https://dash.ghayma.cloud)
 - [Documentation](https://docs.ghayma.cloud)
 - [GitHub Repository](https://github.com/bz-reda/Ghayma-Admin-SDK)
 - [Report an Issue](https://github.com/bz-reda/Ghayma-Admin-SDK/issues)
 
 ## License
 
-MIT © [Ghayma](https://ghayma.tech)
+MIT © [Ghayma](https://ghayma.cloud)

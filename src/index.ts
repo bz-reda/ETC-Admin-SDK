@@ -32,7 +32,7 @@ import { DatabaseClient } from "./database/index.js";
 /**
  * Main Ghayma client.
  *
- * Initialize with your API token from docs.ghayma.dev/settings/tokens.
+ * Initialize with your API token from dash.ghayma.cloud/settings (API Tokens tab).
  */
 export class Ghayma {
   /** Storage — manage buckets, upload/download files, presigned URLs */
