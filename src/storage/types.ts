@@ -13,14 +13,17 @@ export interface Bucket {
   updated_at: string;
 }
 
-/** S3 credentials for a bucket */
+/**
+ * S3 credentials for a bucket — feed these straight into any S3 client
+ * (`accessKeyId: access_key`, `secretAccessKey: secret_key`).
+ */
 export interface BucketCredentials {
   endpoint: string;
-  bucket: string;
-  access_key_id: string;
-  secret_access_key: string;
   region: string;
-  public_url: string | null;
+  /** Underlying S3 bucket name (not the Ghayma bucket id). */
+  bucket: string;
+  access_key: string;
+  secret_key: string;
 }
 
 /** An object (file) in a bucket */

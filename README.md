@@ -164,7 +164,12 @@ const buckets = await client.storage.listBuckets();
 
 // Get S3 credentials (for direct S3 client access)
 const creds = await client.storage.getCredentials("bucket-id");
-console.log(creds.endpoint, creds.access_key_id);
+const s3 = new S3Client({
+  endpoint: creds.endpoint,
+  region: creds.region,
+  credentials: { accessKeyId: creds.access_key, secretAccessKey: creds.secret_key },
+});
+// creds.bucket is the underlying S3 bucket name to pass as `Bucket`
 
 // Rotate credentials
 const newCreds = await client.storage.rotateCredentials("bucket-id");
