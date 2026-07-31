@@ -471,6 +471,9 @@ npm run build
 # Type check
 npm run typecheck
 
+# Contract tests — pins the SDK against the backend's wire format
+npm test
+
 # Watch mode during development
 npm run dev
 ```

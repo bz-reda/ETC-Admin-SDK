@@ -59,6 +59,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "typecheck:contract": "tsc -p tsconfig.contract.json",
+    "test": "npm run typecheck:contract && npm run build && node --test test/*.test.mjs",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build"
   },
