@@ -8,7 +8,7 @@
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "gh_..." });
  *
  * // Storage
  * await client.storage.upload("bucket-id", "photo.jpg", file);
@@ -39,7 +39,7 @@ export class Ghayma {
   public readonly storage: StorageClient;
   /** Auth — manage auth apps and users */
   public readonly auth: AuthClient;
-  /** Database — manage PostgreSQL/Redis/MongoDB, get connections */
+  /** Database — manage PostgreSQL/MongoDB, get connections */
   public readonly database: DatabaseClient;
 
   private readonly http: HttpClient;

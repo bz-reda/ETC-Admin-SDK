@@ -244,7 +244,7 @@ await client.auth.deleteApp("auth-app-id");
 
 ## Database
 
-Manage PostgreSQL, Redis, and MongoDB instances with connection helpers.
+Manage PostgreSQL and MongoDB instances with connection helpers.
 
 ### Get a connection string
 
@@ -260,10 +260,6 @@ const pool = new Pool({ connectionString: conn.url });
 // MongoDB with mongoose
 import mongoose from "mongoose";
 await mongoose.connect(conn.url);
-
-// Redis with ioredis
-import Redis from "ioredis";
-const redis = new Redis(conn.url);
 ```
 
 ### Create a database
@@ -352,7 +348,7 @@ try {
 
 ```ts
 const client = new Ghayma({
-  apiToken: "et_...",                              // Required
+  apiToken: "gh_...",                              // Required
   baseUrl: "https://api.ghayma.tech",              // Default
   timeout: 30000,                                  // 30s default
   maxRetries: 2,                                   // Retries on 5xx errors
@@ -379,7 +375,7 @@ We recommend storing your API token in environment variables:
 
 ```bash
 # .env
-GHAYMA_TOKEN=et_your_api_token
+GHAYMA_TOKEN=gh_your_api_token
 ```
 
 ```ts

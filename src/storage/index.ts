@@ -35,7 +35,7 @@ export type {
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "gh_..." });
  *
  * // Upload a file
  * await client.storage.upload("bucket-id", "images/photo.jpg", file);

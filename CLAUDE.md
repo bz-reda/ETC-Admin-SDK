@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The Ghayma SDK (`@ghayma/sdk`) is the official server-side TypeScript SDK for Ghayma. It provides programmatic access to three services: **Storage** (S3-compatible), **Auth** (user/token management), and **Database** (PostgreSQL, MongoDB, Redis). Zero runtime dependencies — uses native `fetch` (Node 18+).
+The Ghayma SDK (`@ghayma/sdk`) is the official server-side TypeScript SDK for Ghayma. It provides programmatic access to three services: **Storage** (S3-compatible), **Auth** (user/token management), and **Database** (PostgreSQL, MongoDB). Zero runtime dependencies — uses native `fetch` (Node 18+).
 
 ## Commands
 

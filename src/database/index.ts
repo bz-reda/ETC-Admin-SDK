@@ -5,9 +5,7 @@ import type {
   Database,
   DatabaseBackup,
   DatabaseCredentials,
-  DatabaseEngine,
   DatabaseMetrics,
-  DatabaseType,
 } from "./types.js";
 
 export type {
@@ -24,13 +22,13 @@ export type {
 } from "./types.js";
 
 /**
- * Database client for managing PostgreSQL, Redis, and MongoDB instances.
+ * Database client for managing PostgreSQL and MongoDB instances.
  *
  * @example
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "gh_..." });
  *
  * // Get connection string for your app
  * const conn = await client.database.getConnection("db-id");
@@ -108,10 +106,6 @@ export class DatabaseClient {
    * // With mongoose
    * const conn = await client.database.getConnection("mongo-id");
    * await mongoose.connect(conn.url);
-   *
-   * // With ioredis
-   * const conn = await client.database.getConnection("redis-id");
-   * const redis = new Redis(conn.url);
    * ```
    */
   async getConnection(databaseId: string): Promise<ConnectionConfig> {

@@ -34,7 +34,7 @@ export type {
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "gh_..." });
  *
  * // List the users of an auth app
  * const { users } = await client.auth.listUsers("auth-app-id");
