@@ -99,7 +99,10 @@ export class AuthClient {
 
   /** Get auth app statistics */
   async getStats(appId: string): Promise<AuthStats> {
-    return this.http.get<AuthStats>(`/api/v1/auth-apps/${appId}/stats`);
+    const res = await this.http.get<{ stats: AuthStats }>(
+      `/api/v1/auth-apps/${appId}/stats`,
+    );
+    return res.stats;
   }
 
   // ── User Management ────────────────────────────────────────

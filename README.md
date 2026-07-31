@@ -175,7 +175,7 @@ const s3 = new S3Client({
 const newCreds = await client.storage.rotateCredentials("bucket-id");
 
 // Make public/private
-await client.storage.makePublic("bucket-id");
+const { public_url } = await client.storage.makePublic("bucket-id");
 await client.storage.makePrivate("bucket-id");
 
 // Delete bucket
@@ -305,7 +305,7 @@ await client.database.unlink("db-id");
 
 // Get live metrics
 const metrics = await client.database.getMetrics("db-id");
-console.log(metrics.connections, metrics.size);
+console.log(metrics.active_connections, metrics.size_readable);
 
 // Delete database
 await client.database.delete("db-id");

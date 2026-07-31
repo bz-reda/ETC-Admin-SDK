@@ -171,19 +171,20 @@ export class DatabaseClient {
 
   /** Get live database metrics (connections, size, performance) */
   async getMetrics(databaseId: string): Promise<DatabaseMetrics> {
-    return this.http.get<DatabaseMetrics>(
+    const res = await this.http.get<{ metrics: DatabaseMetrics }>(
       `/api/v1/databases/${databaseId}/metrics`,
     );
+    return res.metrics;
   }
 
   // ── Backups ────────────────────────────────────────────────
 
   /** Create a manual backup */
   async createBackup(databaseId: string): Promise<DatabaseBackup> {
-    const res = await this.http.post<{ backup: DatabaseBackup }>(
+    // The backup object comes back at the top level, not under a wrapper key.
+    return this.http.post<DatabaseBackup>(
       `/api/v1/databases/${databaseId}/backups`,
     );
-    return res.backup;
   }
 
   /** List backups for a database */
