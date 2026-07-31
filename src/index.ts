@@ -79,6 +79,7 @@ export type {
   AuthApp,
   AuthStats,
   AuthUser,
+  CreateAuthAppOptions,
   ListUsersOptions,
 } from "./auth/index.js";
 

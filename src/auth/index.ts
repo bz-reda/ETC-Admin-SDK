@@ -3,6 +3,7 @@ import type {
   AuthApp,
   AuthStats,
   AuthUser,
+  CreateAuthAppOptions,
   ListUsersOptions,
 } from "./types.js";
 
@@ -10,6 +11,7 @@ export type {
   AuthApp,
   AuthStats,
   AuthUser,
+  CreateAuthAppOptions,
   ListUsersOptions,
 };
 
@@ -47,12 +49,21 @@ export class AuthClient {
     return res.auth_app;
   }
 
-  /** Create a new auth app */
-  async createApp(options: {
-    name: string;
-    project_id: string;
-    providers?: Partial<{ email: boolean; google: boolean; github: boolean }>;
-  }): Promise<AuthApp> {
+  /**
+   * Create a new auth app.
+   *
+   * `app_id` is required by the backend — it is the public identifier your
+   * client apps authenticate against. OAuth providers are not set here;
+   * enable them afterwards with `updateApp`.
+   *
+   * @example
+   * const app = await client.auth.createApp({
+   *   name: "My App Auth",
+   *   app_id: "my-app",
+   *   project_id: "project-id",
+   * });
+   */
+  async createApp(options: CreateAuthAppOptions): Promise<AuthApp> {
     const res = await this.http.post<{ auth_app: AuthApp }>("/api/v1/auth-apps", options);
     return res.auth_app;
   }

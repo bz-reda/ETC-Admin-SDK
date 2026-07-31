@@ -57,6 +57,21 @@ export interface AuthStats {
   provider_breakdown: Record<string, number>;
 }
 
+/** Options for creating an auth app (POST /auth-apps) */
+export interface CreateAuthAppOptions {
+  /** Display name, 2–50 characters. */
+  name: string;
+  /**
+   * Public app identifier, 3–30 characters and globally unique. Required —
+   * this is the value @ghayma/auth clients are configured with.
+   */
+  app_id: string;
+  project_id: string;
+  team_id?: string;
+  /** Capacity bracket from auth_tiers; blank defaults to the smallest. */
+  auth_tier_slug?: string;
+}
+
 /** Options for listing users */
 export interface ListUsersOptions {
   /** Page number (default: 1) */

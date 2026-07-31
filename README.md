@@ -204,11 +204,11 @@ await client.auth.deleteUser("auth-app-id", "user-id");
 ### Auth app management
 
 ```ts
-// Create an auth app
+// Create an auth app — app_id is required and globally unique
 const app = await client.auth.createApp({
   name: "My App Auth",
+  app_id: "my-app",
   project_id: "project-id",
-  providers: { email: true, google: true, github: true },
 });
 
 // List all auth apps
