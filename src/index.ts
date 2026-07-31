@@ -85,7 +85,9 @@ export type {
   CreateAuthAppOptions,
   EmailLocale,
   ListUsersOptions,
+  ListUsersResult,
   TwoFAPolicy,
+  UpdateAuthAppOptions,
 } from "./auth/index.js";
 
 export { DatabaseClient } from "./database/index.js";

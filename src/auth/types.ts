@@ -114,14 +114,46 @@ export interface CreateAuthAppOptions {
   auth_tier_slug?: string;
 }
 
+/**
+ * Fields an auth app accepts on update (PUT /auth-apps/:id). Anything not
+ * listed here is dropped by the backend's whitelist.
+ */
+export interface UpdateAuthAppOptions {
+  name?: string;
+  /** Origins allowed to call the auth service for this app. */
+  allowed_origins?: string[];
+  email_verification_required?: boolean;
+  google_oauth_enabled?: boolean;
+  google_client_id?: string;
+  google_client_secret?: string;
+  github_oauth_enabled?: boolean;
+  github_client_id?: string;
+  github_client_secret?: string;
+  /** Capacity bracket from auth_tiers — re-prices the app. */
+  auth_tier_slug?: string;
+  two_fa_enabled?: boolean;
+  sms_enabled?: boolean;
+  /** Requires at least one 2FA method enabled when not "disabled". */
+  two_fa_policy?: TwoFAPolicy;
+  /** Custom reset-page URL; the reset token is appended as ?token=. */
+  reset_url?: string;
+  email_locale?: EmailLocale;
+  jwt_expiry_seconds?: number;
+  refresh_expiry_seconds?: number;
+}
+
 /** Options for listing users */
 export interface ListUsersOptions {
   /** Page number (default: 1) */
   page?: number;
-  /** Results per page (default: 50) */
-  limit?: number;
-  /** Filter by provider */
-  provider?: "email" | "google" | "github";
-  /** Search by email or name */
-  search?: string;
+  /** Results per page, 1–100 (default: 20). */
+  per_page?: number;
+}
+
+/** A page of an auth app's users */
+export interface ListUsersResult {
+  users: AuthUser[];
+  total: number;
+  page: number;
+  per_page: number;
 }

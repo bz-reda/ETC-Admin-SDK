@@ -191,11 +191,10 @@ Firebase Auth alternative — manage auth apps and their users.
 ### List and manage users
 
 ```ts
-// List users with pagination
+// List users with pagination (per_page is capped at 100)
 const { users, total } = await client.auth.listUsers("auth-app-id", {
   page: 1,
-  limit: 50,
-  search: "john",
+  per_page: 50,
 });
 
 // Disable/enable a user
@@ -225,7 +224,9 @@ const appInfo = await client.auth.getApp("auth-app-id");
 // Update settings
 await client.auth.updateApp("auth-app-id", {
   name: "Updated Name",
-  providers: { email: true, google: true, github: false },
+  google_oauth_enabled: true,
+  github_oauth_enabled: false,
+  email_verification_required: true,
 });
 
 // Get statistics

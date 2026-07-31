@@ -5,6 +5,8 @@ import type {
   AuthUser,
   CreateAuthAppOptions,
   ListUsersOptions,
+  ListUsersResult,
+  UpdateAuthAppOptions,
 } from "./types.js";
 
 export type {
@@ -16,7 +18,9 @@ export type {
   CreateAuthAppOptions,
   EmailLocale,
   ListUsersOptions,
+  ListUsersResult,
   TwoFAPolicy,
+  UpdateAuthAppOptions,
 } from "./types.js";
 
 /**
@@ -72,17 +76,17 @@ export class AuthClient {
     return res.auth_app;
   }
 
-  /** Update an auth app */
-  async updateApp(
-    appId: string,
-    updates: Partial<{
-      name: string;
-      providers: Partial<{ email: boolean; google: boolean; github: boolean }>;
-      session_duration: number;
-      /** Language of the end-user email templates: "en" | "fr" | "ar" */
-      email_locale: string;
-    }>
-  ): Promise<AuthApp> {
+  /**
+   * Update an auth app. Only the fields on UpdateAuthAppOptions are
+   * applied — the backend silently drops anything else.
+   *
+   * @example
+   * await client.auth.updateApp(appId, {
+   *   google_oauth_enabled: true,
+   *   email_verification_required: true,
+   * });
+   */
+  async updateApp(appId: string, updates: UpdateAuthAppOptions): Promise<AuthApp> {
     const res = await this.http.put<{ auth_app: AuthApp }>(`/api/v1/auth-apps/${appId}`, updates);
     return res.auth_app;
   }
@@ -92,8 +96,12 @@ export class AuthClient {
     await this.http.delete(`/api/v1/auth-apps/${appId}`);
   }
 
-  /** Rotate auth app API keys */
-  async rotateKeys(appId: string): Promise<{ client_id: string; client_secret: string }> {
+  /**
+   * Rotate the auth app's JWT signing keys. Every access and refresh
+   * token issued before the rotation stops verifying, so all end users
+   * are signed out.
+   */
+  async rotateKeys(appId: string): Promise<{ message: string }> {
     return this.http.post(`/api/v1/auth-apps/${appId}/rotate-keys`);
   }
 
@@ -108,17 +116,10 @@ export class AuthClient {
   // ── User Management ────────────────────────────────────────
 
   /** List users in an auth app */
-  async listUsers(appId: string, options?: ListUsersOptions): Promise<{
-    users: AuthUser[];
-    total: number;
-    page: number;
-    limit: number;
-  }> {
+  async listUsers(appId: string, options?: ListUsersOptions): Promise<ListUsersResult> {
     return this.http.get(`/api/v1/auth-apps/${appId}/users`, {
       page: options?.page,
-      limit: options?.limit,
-      provider: options?.provider,
-      search: options?.search,
+      per_page: options?.per_page,
     });
   }
 
