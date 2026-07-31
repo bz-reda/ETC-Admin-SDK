@@ -9,11 +9,15 @@ import type {
 
 export type {
   AuthApp,
+  AuthEvent,
+  AuthProviderCount,
   AuthStats,
   AuthUser,
   CreateAuthAppOptions,
+  EmailLocale,
   ListUsersOptions,
-};
+  TwoFAPolicy,
+} from "./types.js";
 
 /**
  * Auth client for managing authentication apps (Firebase Auth alternative).

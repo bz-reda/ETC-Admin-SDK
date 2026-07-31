@@ -11,6 +11,7 @@ import type {
 } from "./types.js";
 
 export type {
+  BackupTierSlug,
   ConnectionConfig,
   CreateDatabaseOptions,
   Database,
@@ -18,8 +19,9 @@ export type {
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,
+  DatabaseStatus,
   DatabaseType,
-};
+} from "./types.js";
 
 /**
  * Database client for managing PostgreSQL, Redis, and MongoDB instances.

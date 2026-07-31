@@ -14,6 +14,7 @@ import type {
 export type {
   Bucket,
   BucketCredentials,
+  BucketStatus,
   CreateBucketOptions,
   DownloadResult,
   ListObjectsOptions,
@@ -21,7 +22,7 @@ export type {
   PresignedUrl,
   StorageObject,
   UploadOptions,
-};
+} from "./types.js";
 
 /**
  * Storage client for managing S3-compatible buckets and objects.

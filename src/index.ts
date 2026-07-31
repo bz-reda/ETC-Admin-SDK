@@ -65,6 +65,7 @@ export { StorageClient } from "./storage/index.js";
 export type {
   Bucket,
   BucketCredentials,
+  BucketStatus,
   CreateBucketOptions,
   DownloadResult,
   ListObjectsOptions,
@@ -77,14 +78,19 @@ export type {
 export { AuthClient } from "./auth/index.js";
 export type {
   AuthApp,
+  AuthEvent,
+  AuthProviderCount,
   AuthStats,
   AuthUser,
   CreateAuthAppOptions,
+  EmailLocale,
   ListUsersOptions,
+  TwoFAPolicy,
 } from "./auth/index.js";
 
 export { DatabaseClient } from "./database/index.js";
 export type {
+  BackupTierSlug,
   ConnectionConfig,
   CreateDatabaseOptions,
   Database,
@@ -92,5 +98,6 @@ export type {
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,
+  DatabaseStatus,
   DatabaseType,
 } from "./database/index.js";

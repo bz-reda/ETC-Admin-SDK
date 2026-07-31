@@ -1,14 +1,23 @@
-/** Storage bucket */
+/** Lifecycle status of a bucket. */
+export type BucketStatus = "provisioning" | "active" | "error";
+
+/** Storage bucket (GET /storage, GET /storage/:id). */
 export interface Bucket {
   id: string;
+  user_id: string;
+  /** Absent for buckets not attached to a project. */
+  project_id?: string;
+  team_id?: string;
   name: string;
-  project_id: string;
-  status: "provisioning" | "ready" | "active" | "error" | "deleting";
-  size_bytes: number;
-  object_count: number;
+  /** Underlying S3 bucket name — pass this as `Bucket` to an S3 client. */
+  garage_bucket: string;
+  status: BucketStatus;
+  storage_used_bytes: number;
+  storage_limit_bytes: number;
   is_public: boolean;
-  public_url: string | null;
-  quota_bytes: number;
+  external_access: boolean;
+  /** CORS allow-list pushed to the S3 layer. */
+  allowed_origins: string[];
   created_at: string;
   updated_at: string;
 }
