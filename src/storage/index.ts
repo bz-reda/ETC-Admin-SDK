@@ -4,24 +4,29 @@ import type {
   BucketCredentials,
   CreateBucketOptions,
   DownloadResult,
+  ExposeResult,
   ListObjectsOptions,
   ListObjectsResult,
   PresignedUrl,
   StorageObject,
   UploadOptions,
+  UploadResult,
 } from "./types.js";
 
 export type {
   Bucket,
   BucketCredentials,
+  BucketStatus,
   CreateBucketOptions,
   DownloadResult,
+  ExposeResult,
   ListObjectsOptions,
   ListObjectsResult,
   PresignedUrl,
   StorageObject,
   UploadOptions,
-};
+  UploadResult,
+} from "./types.js";
 
 /**
  * Storage client for managing S3-compatible buckets and objects.
@@ -30,7 +35,7 @@ export type {
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "gh_..." });
  *
  * // Upload a file
  * await client.storage.upload("bucket-id", "images/photo.jpg", file);
@@ -86,16 +91,17 @@ export class StorageClient {
     return res.credentials;
   }
 
-  /** Make bucket publicly accessible */
-  async makePublic(bucketId: string): Promise<Bucket> {
-    const res = await this.http.post<{ bucket: Bucket }>(`/api/v1/storage/${bucketId}/expose`);
-    return res.bucket;
+  /**
+   * Make bucket publicly accessible. Returns the public base URL its
+   * objects are served from.
+   */
+  async makePublic(bucketId: string): Promise<ExposeResult> {
+    return this.http.post<ExposeResult>(`/api/v1/storage/${bucketId}/expose`);
   }
 
   /** Make bucket private */
-  async makePrivate(bucketId: string): Promise<Bucket> {
-    const res = await this.http.post<{ bucket: Bucket }>(`/api/v1/storage/${bucketId}/unexpose`);
-    return res.bucket;
+  async makePrivate(bucketId: string): Promise<void> {
+    await this.http.post(`/api/v1/storage/${bucketId}/unexpose`);
   }
 
   // ── Object Operations ──────────────────────────────────────
@@ -125,7 +131,7 @@ export class StorageClient {
     key: string,
     data: Blob | File,
     options?: UploadOptions
-  ): Promise<StorageObject> {
+  ): Promise<UploadResult> {
     const formData = new FormData();
     formData.append("key", key);
 
@@ -135,12 +141,11 @@ export class StorageClient {
       formData.append("file", data, key.split("/").pop());
     }
 
-    const res = await this.http.upload<{ object: StorageObject }>(
+    return this.http.upload<UploadResult>(
       `/api/v1/storage/${bucketId}/objects/upload`,
       formData,
       options?.timeout ?? 300_000 // 5 min default for uploads
     );
-    return res.object;
   }
 
   /**

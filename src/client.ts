@@ -6,7 +6,7 @@
  */
 
 export interface ClientConfig {
-  /** API token from docs.ghayma.dev/settings/tokens */
+  /** API token from dash.ghayma.cloud/settings (API Tokens tab) */
   apiToken: string;
   /** Base URL override (default: https://api.ghayma.tech) */
   baseUrl?: string;
@@ -47,7 +47,7 @@ export class HttpClient {
 
   constructor(config: ClientConfig) {
     if (!config.apiToken) {
-      throw new Error("@ghayma/sdk: apiToken is required. Get one at docs.ghayma.dev/settings/tokens");
+      throw new Error("@ghayma/sdk: apiToken is required. Get one at https://dash.ghayma.cloud/settings (API Tokens tab)");
     }
     this.apiToken = config.apiToken;
     let envUrl: string | undefined;

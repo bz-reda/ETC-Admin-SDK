@@ -1,8 +1,8 @@
 {
   "name": "@ghayma/sdk",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Official SDK for Ghayma — storage, auth, and database helpers",
-  "author": "Ghayma <hello@ghayma.dev>",
+  "author": "Ghayma <hello@ghayma.cloud>",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -59,6 +59,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
+    "typecheck:contract": "tsc -p tsconfig.contract.json",
+    "test": "npm run typecheck:contract && npm run build && node --test test/*.test.mjs",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build"
   },
@@ -81,7 +83,7 @@
     "type": "git",
     "url": "https://github.com/bz-reda/Ghayma-Admin-SDK"
   },
-  "homepage": "https://docs.ghayma.dev",
+  "homepage": "https://docs.ghayma.cloud",
   "engines": {
     "node": ">=18.0.0"
   }

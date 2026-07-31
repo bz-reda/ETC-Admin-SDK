@@ -8,7 +8,7 @@
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "et_..." });
+ * const client = new Ghayma({ apiToken: "gh_..." });
  *
  * // Storage
  * await client.storage.upload("bucket-id", "photo.jpg", file);
@@ -32,14 +32,14 @@ import { DatabaseClient } from "./database/index.js";
 /**
  * Main Ghayma client.
  *
- * Initialize with your API token from docs.ghayma.dev/settings/tokens.
+ * Initialize with your API token from dash.ghayma.cloud/settings (API Tokens tab).
  */
 export class Ghayma {
   /** Storage — manage buckets, upload/download files, presigned URLs */
   public readonly storage: StorageClient;
   /** Auth — manage auth apps and users */
   public readonly auth: AuthClient;
-  /** Database — manage PostgreSQL/Redis/MongoDB, get connections */
+  /** Database — manage PostgreSQL/MongoDB, get connections */
   public readonly database: DatabaseClient;
 
   private readonly http: HttpClient;
@@ -65,6 +65,7 @@ export { StorageClient } from "./storage/index.js";
 export type {
   Bucket,
   BucketCredentials,
+  BucketStatus,
   CreateBucketOptions,
   DownloadResult,
   ListObjectsOptions,
@@ -77,13 +78,21 @@ export type {
 export { AuthClient } from "./auth/index.js";
 export type {
   AuthApp,
+  AuthEvent,
+  AuthProviderCount,
   AuthStats,
   AuthUser,
+  CreateAuthAppOptions,
+  EmailLocale,
   ListUsersOptions,
+  ListUsersResult,
+  TwoFAPolicy,
+  UpdateAuthAppOptions,
 } from "./auth/index.js";
 
 export { DatabaseClient } from "./database/index.js";
 export type {
+  BackupTierSlug,
   ConnectionConfig,
   CreateDatabaseOptions,
   Database,
@@ -91,5 +100,6 @@ export type {
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,
+  DatabaseStatus,
   DatabaseType,
 } from "./database/index.js";

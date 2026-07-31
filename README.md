@@ -1,6 +1,6 @@
 # @ghayma/sdk
 
-Official TypeScript SDK for [Ghayma](https://ghayma.tech) — storage, authentication, and database management for the Algerian and African developer ecosystem.
+Official TypeScript SDK for [Ghayma](https://ghayma.cloud) — storage, authentication, and database management for the Algerian and African developer ecosystem.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org)
@@ -21,7 +21,7 @@ pnpm add github:bz-reda/Ghayma-Admin-SDK
 
 ## Prerequisites
 
-1. Create an account at [app.ghayma.tech](https://app.ghayma.tech)
+1. Create an account at [dash.ghayma.cloud](https://dash.ghayma.cloud)
 2. Generate an API token at **Settings → API Tokens**
 3. Node.js 18 or higher (uses native `fetch`)
 
@@ -31,7 +31,7 @@ pnpm add github:bz-reda/Ghayma-Admin-SDK
 import { Ghayma } from "@ghayma/sdk";
 
 const client = new Ghayma({
-  apiToken: process.env.GHAYMA_TOKEN!, // Get from app.ghayma.tech/settings/tokens
+  apiToken: process.env.GHAYMA_TOKEN!, // Settings -> API Tokens on dash.ghayma.cloud
 });
 ```
 
@@ -164,13 +164,18 @@ const buckets = await client.storage.listBuckets();
 
 // Get S3 credentials (for direct S3 client access)
 const creds = await client.storage.getCredentials("bucket-id");
-console.log(creds.endpoint, creds.access_key_id);
+const s3 = new S3Client({
+  endpoint: creds.endpoint,
+  region: creds.region,
+  credentials: { accessKeyId: creds.access_key, secretAccessKey: creds.secret_key },
+});
+// creds.bucket is the underlying S3 bucket name to pass as `Bucket`
 
 // Rotate credentials
 const newCreds = await client.storage.rotateCredentials("bucket-id");
 
 // Make public/private
-await client.storage.makePublic("bucket-id");
+const { public_url } = await client.storage.makePublic("bucket-id");
 await client.storage.makePrivate("bucket-id");
 
 // Delete bucket
@@ -186,11 +191,10 @@ Firebase Auth alternative — manage auth apps and their users.
 ### List and manage users
 
 ```ts
-// List users with pagination
+// List users with pagination (per_page is capped at 100)
 const { users, total } = await client.auth.listUsers("auth-app-id", {
   page: 1,
-  limit: 50,
-  search: "john",
+  per_page: 50,
 });
 
 // Disable/enable a user
@@ -204,11 +208,11 @@ await client.auth.deleteUser("auth-app-id", "user-id");
 ### Auth app management
 
 ```ts
-// Create an auth app
+// Create an auth app — app_id is required and globally unique
 const app = await client.auth.createApp({
   name: "My App Auth",
+  app_id: "my-app",
   project_id: "project-id",
-  providers: { email: true, google: true, github: true },
 });
 
 // List all auth apps
@@ -220,7 +224,9 @@ const appInfo = await client.auth.getApp("auth-app-id");
 // Update settings
 await client.auth.updateApp("auth-app-id", {
   name: "Updated Name",
-  providers: { email: true, google: true, github: false },
+  google_oauth_enabled: true,
+  github_oauth_enabled: false,
+  email_verification_required: true,
 });
 
 // Get statistics
@@ -238,7 +244,7 @@ await client.auth.deleteApp("auth-app-id");
 
 ## Database
 
-Manage PostgreSQL, Redis, and MongoDB instances with connection helpers.
+Manage PostgreSQL and MongoDB instances with connection helpers.
 
 ### Get a connection string
 
@@ -254,10 +260,6 @@ const pool = new Pool({ connectionString: conn.url });
 // MongoDB with mongoose
 import mongoose from "mongoose";
 await mongoose.connect(conn.url);
-
-// Redis with ioredis
-import Redis from "ioredis";
-const redis = new Redis(conn.url);
 ```
 
 ### Create a database
@@ -300,7 +302,7 @@ await client.database.unlink("db-id");
 
 // Get live metrics
 const metrics = await client.database.getMetrics("db-id");
-console.log(metrics.connections, metrics.size);
+console.log(metrics.active_connections, metrics.size_readable);
 
 // Delete database
 await client.database.delete("db-id");
@@ -346,7 +348,7 @@ try {
 
 ```ts
 const client = new Ghayma({
-  apiToken: "et_...",                              // Required
+  apiToken: "gh_...",                              // Required
   baseUrl: "https://api.ghayma.tech",              // Default
   timeout: 30000,                                  // 30s default
   maxRetries: 2,                                   // Retries on 5xx errors
@@ -373,7 +375,7 @@ We recommend storing your API token in environment variables:
 
 ```bash
 # .env
-GHAYMA_TOKEN=et_your_api_token
+GHAYMA_TOKEN=gh_your_api_token
 ```
 
 ```ts
@@ -469,6 +471,9 @@ npm run build
 # Type check
 npm run typecheck
 
+# Contract tests — pins the SDK against the backend's wire format
+npm test
+
 # Watch mode during development
 npm run dev
 ```
@@ -479,11 +484,11 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 
 ## Links
 
-- [Ghayma Dashboard](https://app.ghayma.tech)
+- [Ghayma Dashboard](https://dash.ghayma.cloud)
 - [Documentation](https://docs.ghayma.cloud)
 - [GitHub Repository](https://github.com/bz-reda/Ghayma-Admin-SDK)
 - [Report an Issue](https://github.com/bz-reda/Ghayma-Admin-SDK/issues)
 
 ## License
 
-MIT © [Ghayma](https://ghayma.tech)
+MIT © [Ghayma](https://ghayma.cloud)

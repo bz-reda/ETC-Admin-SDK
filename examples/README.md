@@ -24,7 +24,7 @@ A complete example showing how to display images from Ghayma Storage in a Next.j
 
 2. Add environment variables to `.env.local`:
    ```
-   GHAYMA_TOKEN=et_your_api_token
+   GHAYMA_TOKEN=gh_your_api_token
    GHAYMA_BUCKET_ID=your_bucket_id
    ```
 
