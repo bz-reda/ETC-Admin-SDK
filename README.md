@@ -272,6 +272,9 @@ const db = await client.database.create({
 });
 ```
 
+A database belongs to the project it is created in for its whole life; it
+cannot be moved to another project afterwards.
+
 ### Manage databases
 
 ```ts
@@ -295,10 +298,6 @@ await client.database.start("db-id");
 // Enable / disable external access
 await client.database.expose("db-id");
 await client.database.unexpose("db-id");
-
-// Link / unlink to a project (injects DATABASE_URL env var)
-await client.database.link("db-id", "project-id");
-await client.database.unlink("db-id");
 
 // Get live metrics
 const metrics = await client.database.getMetrics("db-id");

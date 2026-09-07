@@ -147,20 +147,6 @@ export class DatabaseClient {
     await this.http.post(`/api/v1/databases/${databaseId}/unexpose`);
   }
 
-  // ── Linking ────────────────────────────────────────────────
-
-  /** Link database to a project (injects env vars) */
-  async link(databaseId: string, projectId: string): Promise<void> {
-    await this.http.post(`/api/v1/databases/${databaseId}/link`, {
-      project_id: projectId,
-    });
-  }
-
-  /** Unlink database from a project */
-  async unlink(databaseId: string): Promise<void> {
-    await this.http.post(`/api/v1/databases/${databaseId}/unlink`);
-  }
-
   // ── Metrics ────────────────────────────────────────────────
 
   /** Get live database metrics (connections, size, performance) */
