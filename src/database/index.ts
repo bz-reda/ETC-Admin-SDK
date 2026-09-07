@@ -1,4 +1,4 @@
-import { HttpClient } from "../client.js";
+import { HttpClient } from "../http.js";
 import type {
   ConnectionConfig,
   CreateDatabaseOptions,

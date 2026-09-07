@@ -24,7 +24,7 @@
  * @packageDocumentation
  */
 
-import { HttpClient, type ClientConfig } from "./client.js";
+import { HttpClient, type ClientConfig } from "./http.js";
 import { StorageClient } from "./storage/index.js";
 import { AuthClient } from "./auth/index.js";
 import { DatabaseClient } from "./database/index.js";
@@ -44,7 +44,7 @@ export class Ghayma {
 
   private readonly http: HttpClient;
 
-  constructor(config: ClientConfig) {
+  constructor(config: ClientConfig = {}) {
     this.http = new HttpClient(config);
     this.storage = new StorageClient(this.http);
     this.auth = new AuthClient(this.http);
@@ -56,10 +56,10 @@ export class Ghayma {
 export { Ghayma as EspaceTech };
 
 // Re-export everything
-export { GhaymaError } from "./client.js";
+export { GhaymaError } from "./http.js";
 /** @deprecated use GhaymaError */
-export { EspaceError } from "./client.js";
-export type { ClientConfig } from "./client.js";
+export { EspaceError } from "./http.js";
+export type { ClientConfig } from "./http.js";
 
 export { StorageClient } from "./storage/index.js";
 export type {

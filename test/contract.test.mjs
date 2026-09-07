@@ -35,7 +35,7 @@ function stubFetch(body, status = 200) {
   return calls;
 }
 
-const client = () => new Ghayma({ apiToken: "gh_test", maxRetries: 0 });
+const client = () => new Ghayma({ apiKey: "gsk_test", maxRetries: 0 });
 
 const sentBody = (call) => JSON.parse(call.init.body);
 
@@ -208,15 +208,42 @@ test("auth.listUsers surfaces email_verified and last_login_at", async () => {
   assert.equal(users[0].last_login_at, AUTH_USER.last_login_at);
 });
 
-// ── Onboarding ─────────────────────────────────────────────────
+// ── Credentials ────────────────────────────────────────────────
 
-test("the missing-token error points at a host that resolves", () => {
-  assert.throws(
-    () => new Ghayma({ apiToken: "" }),
-    (err) => {
-      assert.match(err.message, /dash\.ghayma\.cloud/);
-      assert.doesNotMatch(err.message, /ghayma\.dev|app\.ghayma\.tech/);
-      return true;
-    },
-  );
+test("apiKey is sent as the bearer credential", async () => {
+  const calls = stubFetch({ buckets: [] });
+  await new Ghayma({ apiKey: "gsk_test", maxRetries: 0 }).storage.listBuckets();
+  assert.equal(calls[0].init.headers.Authorization, "Bearer gsk_test");
+});
+
+test("zero-argument init reads GHAYMA_API_KEY", async () => {
+  process.env.GHAYMA_API_KEY = "gsk_env";
+  try {
+    const calls = stubFetch({ buckets: [] });
+    await new Ghayma().storage.listBuckets();
+    assert.equal(calls[0].init.headers.Authorization, "Bearer gsk_env");
+  } finally {
+    delete process.env.GHAYMA_API_KEY;
+  }
+});
+
+test("missing credential throws a message that points at project keys", () => {
+  delete process.env.GHAYMA_API_KEY;
+  assert.throws(() => new Ghayma(), /Project → Settings → API keys|GHAYMA_API_KEY/);
+});
+
+test("an account token still works but warns once", async () => {
+  const warnings = [];
+  const orig = console.warn;
+  console.warn = (msg) => warnings.push(String(msg));
+  try {
+    const calls = stubFetch({ buckets: [] });
+    const c = new Ghayma({ apiToken: "gh_old", maxRetries: 0 });
+    await c.storage.listBuckets();
+    await c.storage.listBuckets();
+    assert.equal(calls[0].init.headers.Authorization, "Bearer gh_old");
+    assert.equal(warnings.filter((w) => w.includes("account token")).length, 1);
+  } finally {
+    console.warn = orig;
+  }
 });
