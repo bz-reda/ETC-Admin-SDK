@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The Ghayma SDK (`@ghayma/sdk`) is the official server-side TypeScript SDK for Ghayma. It provides programmatic access to three services: **Storage** (S3-compatible), **Auth** (user/token management), and **Database** (PostgreSQL, MongoDB). Zero runtime dependencies — uses native `fetch` (Node 18+).
+The Ghayma SDK (`@ghayma/sdk`) is the runtime SDK an app running on Ghayma imports. Two entry points: the **server** entry (`@ghayma/sdk`, holds a project API key `gsk_…`: auth-app user administration, storage helpers, database connection details) and the **client** entry (`@ghayma/sdk/client`, browser: `GhaymaAuth` end-user login, sessions, 2FA — the code that shipped as `@ghayma/auth`). Infrastructure management (creating or deleting buckets, databases and auth apps, rotation, expose, backups) is NOT in this package: it lives in the console and the `ghayma` CLI. Zero runtime dependencies — uses native `fetch` (Node 18+).
 
 ## Commands
 
@@ -38,27 +38,33 @@ runner — there is no test framework to install.
 
 ```
 src/
-├── client.ts           # HttpClient base class + GhaymaError + ClientConfig
-├── index.ts            # Ghayma facade class, re-exports all public API
+├── http.ts             # HttpClient base class + GhaymaError + ClientConfig (credential resolution, warning)
+├── index.ts            # Ghayma facade class (server entry), re-exports the server public API
+├── client/             # Browser entry (@ghayma/sdk/client): GhaymaAuth, TokenManager, AuthError, types
+│   ├── index.ts        #   moved in verbatim from @ghayma/auth; never imports http.ts or the server modules
+│   ├── client.ts       #   auth-service HTTP client (X-Ghayma-Server-Key / X-Ghayma-Client-IP)
+│   ├── token.ts        #   TokenManager (memory / localStorage)
+│   └── types.ts
 ├── storage/
-│   ├── index.ts        # StorageClient (buckets, objects, presigned URLs, download)
+│   ├── index.ts        # StorageClient (list/get buckets, credentials, objects, presigned URLs, download)
 │   └── types.ts        # Bucket, StorageObject, PresignedUrl, etc.
 ├── auth/
-│   ├── index.ts        # AuthClient (auth apps, user management)
+│   ├── index.ts        # AuthClient (auth-app USER administration: users, roles, reset links, stats)
 │   └── types.ts        # AuthApp, AuthUser, etc.
 └── database/
-    ├── index.ts        # DatabaseClient (CRUD, connections, metrics, backups)
+    ├── index.ts        # DatabaseClient (list/get, credentials, connection, metrics)
     └── types.ts        # Database, DatabaseCredentials, DatabaseEngine, etc.
 ```
 
-**Key pattern:** `Ghayma` is the public facade. It creates an `HttpClient` and injects it into `StorageClient`, `AuthClient`, and `DatabaseClient`. All HTTP concerns (auth headers, retries, timeouts, error parsing) live in `HttpClient`.
+**Key pattern:** `Ghayma` is the server facade. It creates an `HttpClient` and injects it into `StorageClient`, `AuthClient`, and `DatabaseClient`. All HTTP concerns (credential header, retries, timeouts, error parsing) live in `HttpClient`. The credential is `apiKey` → deprecated `apiToken` → `GHAYMA_API_KEY`; a `gh_`/`et_` account token still works but warns once per process. The client entry is independent: it talks to the auth service with an app slug and never holds the project key.
 
 **Backward-compat aliases:** `Ghayma` is re-exported as the deprecated `EspaceTech`, and `GhaymaError` as the deprecated `EspaceError`, so consumers migrate with only a package-name change.
 
 ## Build System
 
-- **tsup** builds four entry points (`index`, `storage/index`, `auth/index`, `database/index`) into both ESM and CJS with type declarations, source maps, tree-shaking, and code splitting.
-- Package exports allow importing submodules directly: `@ghayma/sdk/storage`.
+- **tsup** builds five entry points (`index`, `storage/index`, `auth/index`, `database/index`, `client/index`) into both ESM and CJS with type declarations, source maps, tree-shaking, and code splitting.
+- Package exports allow importing submodules directly: `@ghayma/sdk/storage`, and the browser half as `@ghayma/sdk/client`.
+- `npm test` also runs the client suites under `test/client/` (copied with the client code).
 
 ## Key Conventions
 
@@ -67,4 +73,5 @@ src/
 - Retries use exponential backoff with jitter, only on 5xx or network errors.
 - `rawFetch` is used for streaming responses (file downloads) — separate from the JSON `request` method.
 - Environment variable `GHAYMA_API_URL` overrides the default base URL (for internal cluster routing) — an explicitly-passed `baseUrl` always wins; the legacy `ESPACE_API_URL` is still read as a fallback.
-- The SDK targets both browser and Node.js — uses `globalThis` and guards `process.env` access.
+- The server entry targets Node and edge runtimes; the client entry targets browsers (and servers holding a `serverKey`). Both use `globalThis` and guard `process.env` access.
+- Publishing is the operator's step (`npm publish`, 2FA). After a release that changes the client entry, the `@ghayma/auth` alias package (Ghayma-Auth-SDK) re-exports `@ghayma/sdk/client` and follows.
