@@ -21,7 +21,7 @@ Zero runtime dependencies — the SDK uses native `fetch` (Node.js 18+, Deno, Bu
 ```ts
 import { Ghayma } from "@ghayma/sdk";
 
-// In an app connected on Ghayma, GHAYMA_API_KEY is injected: no arguments needed.
+// With GHAYMA_API_KEY set in your site's environment variables, no arguments are needed.
 const ghayma = new Ghayma();
 // Anywhere else, pass a project API key (Project → Settings → API keys):
 // const ghayma = new Ghayma({ apiKey: process.env.GHAYMA_API_KEY });
@@ -376,7 +376,7 @@ import { GhaymaAuth } from "@ghayma/sdk/client";
 
 | Variable | Read by | Purpose |
 |---|---|---|
-| `GHAYMA_API_KEY` | server entry | The project API key, injected into connected apps |
+| `GHAYMA_API_KEY` | server entry | The project API key. Set it in your site's environment variables today; automatic injection arrives with Connections |
 | `GHAYMA_API_URL` | server entry | Base URL override (an explicit `baseUrl` still wins) |
 | `ESPACETECH_AUTH_SERVER_KEY_<SLUG>` | client entry, server-side only | The auth app's server key, injected into connected apps |
 

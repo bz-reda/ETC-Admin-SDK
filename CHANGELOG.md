@@ -18,7 +18,7 @@ which is why this release is breaking.
 - **`apiKey`** — a project API key (`gsk_…`) from **Project → Settings → API
   keys**. Scoped to one project, which is what an app needs.
 - **Zero-argument init** — `new Ghayma()` reads `GHAYMA_API_KEY`, the variable
-  Ghayma injects into a connected app, so a hosted app passes nothing at all.
+  you set in your site's environment variables, so the app passes nothing at all. (Automatic injection arrives with Connections.)
 - **Account-token warning** — passing a `gh_…` (or legacy `et_…`) credential
   logs one warning per process saying it acts as you across every project and
   pointing at project API keys.

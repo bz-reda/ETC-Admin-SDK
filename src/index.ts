@@ -11,7 +11,7 @@
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * // In an app connected on Ghayma, GHAYMA_API_KEY is injected: no arguments needed.
+ * // With GHAYMA_API_KEY set in the site's environment variables, no arguments are needed.
  * const ghayma = new Ghayma();
  * // Anywhere else, pass a project API key (Project → Settings → API keys):
  * // const ghayma = new Ghayma({ apiKey: process.env.GHAYMA_API_KEY });
@@ -40,7 +40,7 @@ import { DatabaseClient } from "./database/index.js";
  *
  * Initialize with a project API key (`gsk_…`) from Project → Settings →
  * API keys, or with no arguments at all in an app connected on Ghayma,
- * where `GHAYMA_API_KEY` is injected for you.
+ * where `GHAYMA_API_KEY` is set in the site's environment variables.
  */
 export class Ghayma {
   /** Storage — upload/download objects, list them, presigned URLs */

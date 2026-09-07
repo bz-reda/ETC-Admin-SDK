@@ -60,7 +60,7 @@ export class HttpClient {
   private readonly maxRetries: number;
 
   constructor(config: ClientConfig = {}) {
-    // A connected app gets GHAYMA_API_KEY injected, so `new Ghayma()` works
+    // A hosted app sets GHAYMA_API_KEY in its environment, so `new Ghayma()` works
     // there with no arguments; the deprecated account token still resolves.
     const credential = config.apiKey || config.apiToken || readEnv("GHAYMA_API_KEY") || "";
     if (!credential) {
