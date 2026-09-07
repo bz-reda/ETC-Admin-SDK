@@ -1,7 +1,7 @@
 {
   "name": "@ghayma/sdk",
-  "version": "0.6.0",
-  "description": "Official SDK for Ghayma — storage, auth, and database helpers",
+  "version": "1.0.0",
+  "description": "Ghayma runtime SDK — auth, storage and database helpers for apps running on Ghayma",
   "author": "Ghayma <hello@ghayma.cloud>",
   "license": "MIT",
   "type": "module",
@@ -48,6 +48,16 @@
         "types": "./dist/database/index.d.cts",
         "default": "./dist/database/index.cjs"
       }
+    },
+    "./client": {
+      "import": {
+        "types": "./dist/client/index.d.ts",
+        "default": "./dist/client/index.js"
+      },
+      "require": {
+        "types": "./dist/client/index.d.cts",
+        "default": "./dist/client/index.cjs"
+      }
     }
   },
   "files": [
@@ -61,7 +71,7 @@
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "typecheck:contract": "tsc -p tsconfig.contract.json",
-    "test": "npm run typecheck:contract && npm run build && node --test test/*.test.mjs",
+    "test": "npm run typecheck:contract && npm run build && node --test test/*.test.mjs test/client/*.test.mjs",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build"
   },
@@ -78,7 +88,9 @@
     "database",
     "paas",
     "algeria",
-    "africa"
+    "africa",
+    "login",
+    "jwt"
   ],
   "repository": {
     "type": "git",

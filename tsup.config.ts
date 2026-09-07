@@ -6,6 +6,7 @@ export default defineConfig({
     "storage/index": "src/storage/index.ts",
     "auth/index": "src/auth/index.ts",
     "database/index": "src/database/index.ts",
+    "client/index": "src/client/index.ts",
   },
   format: ["esm", "cjs"],
   dts: true,
