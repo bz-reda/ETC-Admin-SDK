@@ -1,24 +1,30 @@
 /**
  * @ghayma/sdk
  *
- * Official SDK for Ghayma.
- * Manage storage, auth, and databases programmatically.
+ * The runtime SDK for apps running on Ghayma — the server half. It holds a
+ * project API key, so it belongs in server code only; the browser half is
+ * `@ghayma/sdk/client`, which signs end users in with an app slug and never
+ * sees the key. Creating and deleting infrastructure is not here: that is
+ * the console and the `ghayma` CLI.
  *
  * @example
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "gh_..." });
+ * // In an app connected on Ghayma, GHAYMA_API_KEY is injected: no arguments needed.
+ * const ghayma = new Ghayma();
+ * // Anywhere else, pass a project API key (Project → Settings → API keys):
+ * // const ghayma = new Ghayma({ apiKey: process.env.GHAYMA_API_KEY });
  *
  * // Storage
- * await client.storage.upload("bucket-id", "photo.jpg", file);
- * const { url } = await client.storage.getDownloadUrl("bucket-id", "photo.jpg");
+ * await ghayma.storage.upload("bucket-id", "photo.jpg", file);
+ * const { url } = await ghayma.storage.getDownloadUrl("bucket-id", "photo.jpg");
  *
- * // Auth — manage an auth app's users
- * const { users } = await client.auth.listUsers("app-id");
+ * // Auth — administer an auth app's end users
+ * const { users } = await ghayma.auth.listUsers("my-app");
  *
- * // Database — get connection strings
- * const conn = await client.database.getConnection("db-id");
+ * // Database — get connection details
+ * const conn = await ghayma.database.getConnection("db-id");
  * ```
  *
  * @packageDocumentation
@@ -32,14 +38,16 @@ import { DatabaseClient } from "./database/index.js";
 /**
  * Main Ghayma client.
  *
- * Initialize with your API token from dash.ghayma.cloud/settings (API Tokens tab).
+ * Initialize with a project API key (`gsk_…`) from Project → Settings →
+ * API keys, or with no arguments at all in an app connected on Ghayma,
+ * where `GHAYMA_API_KEY` is injected for you.
  */
 export class Ghayma {
-  /** Storage — manage buckets, upload/download files, presigned URLs */
+  /** Storage — upload/download objects, list them, presigned URLs */
   public readonly storage: StorageClient;
-  /** Auth — manage auth apps and users */
+  /** Auth — administer an auth app's end users */
   public readonly auth: AuthClient;
-  /** Database — manage PostgreSQL/MongoDB, get connections */
+  /** Database — connection details and live metrics */
   public readonly database: DatabaseClient;
 
   private readonly http: HttpClient;
@@ -66,7 +74,6 @@ export type {
   Bucket,
   BucketCredentials,
   BucketStatus,
-  CreateBucketOptions,
   DownloadResult,
   ListObjectsOptions,
   ListObjectsResult,
@@ -82,21 +89,17 @@ export type {
   AuthProviderCount,
   AuthStats,
   AuthUser,
-  CreateAuthAppOptions,
   EmailLocale,
   ListUsersOptions,
   ListUsersResult,
   TwoFAPolicy,
-  UpdateAuthAppOptions,
 } from "./auth/index.js";
 
 export { DatabaseClient } from "./database/index.js";
 export type {
   BackupTierSlug,
   ConnectionConfig,
-  CreateDatabaseOptions,
   Database,
-  DatabaseBackup,
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,

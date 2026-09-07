@@ -3,10 +3,8 @@ import type {
   AuthApp,
   AuthStats,
   AuthUser,
-  CreateAuthAppOptions,
   ListUsersOptions,
   ListUsersResult,
-  UpdateAuthAppOptions,
 } from "./types.js";
 
 export type {
@@ -15,35 +13,36 @@ export type {
   AuthProviderCount,
   AuthStats,
   AuthUser,
-  CreateAuthAppOptions,
   EmailLocale,
   ListUsersOptions,
   ListUsersResult,
   TwoFAPolicy,
-  UpdateAuthAppOptions,
 } from "./types.js";
 
 /**
- * Auth client for managing authentication apps (Firebase Auth alternative).
+ * Auth — administer an auth app's end users from your server.
  *
- * Use this to manage auth apps and their users, rotate keys, and monitor
- * auth app statistics. End-user token verification is handled by the
- * client-side Auth-SDK (@ghayma/auth), not this server-side admin SDK.
+ * Read an app's configuration and statistics, page through its users,
+ * disable or delete one, mint a password-reset link, and set the
+ * app_metadata that lands in a user's JWT. Creating auth apps, editing
+ * their settings and rotating their signing keys are management: they live
+ * in the console and the `ghayma` CLI. End users sign in from the browser
+ * with `@ghayma/sdk/client`.
  *
  * @example
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "gh_..." });
+ * const ghayma = new Ghayma();
  *
  * // List the users of an auth app
- * const { users } = await client.auth.listUsers("auth-app-id");
+ * const { users } = await ghayma.auth.listUsers("my-app");
  * ```
  */
 export class AuthClient {
   constructor(private readonly http: HttpClient) {}
 
-  // ── Auth App Management ────────────────────────────────────
+  // ── Auth Apps (read-only) ──────────────────────────────────
 
   /** List all auth apps */
   async listApps(): Promise<AuthApp[]> {
@@ -55,54 +54,6 @@ export class AuthClient {
   async getApp(appId: string): Promise<AuthApp> {
     const res = await this.http.get<{ auth_app: AuthApp }>(`/api/v1/auth-apps/${appId}`);
     return res.auth_app;
-  }
-
-  /**
-   * Create a new auth app.
-   *
-   * `app_id` is required by the backend — it is the public identifier your
-   * client apps authenticate against. OAuth providers are not set here;
-   * enable them afterwards with `updateApp`.
-   *
-   * @example
-   * const app = await client.auth.createApp({
-   *   name: "My App Auth",
-   *   app_id: "my-app",
-   *   project_id: "project-id",
-   * });
-   */
-  async createApp(options: CreateAuthAppOptions): Promise<AuthApp> {
-    const res = await this.http.post<{ auth_app: AuthApp }>("/api/v1/auth-apps", options);
-    return res.auth_app;
-  }
-
-  /**
-   * Update an auth app. Only the fields on UpdateAuthAppOptions are
-   * applied — the backend silently drops anything else.
-   *
-   * @example
-   * await client.auth.updateApp(appId, {
-   *   google_oauth_enabled: true,
-   *   email_verification_required: true,
-   * });
-   */
-  async updateApp(appId: string, updates: UpdateAuthAppOptions): Promise<AuthApp> {
-    const res = await this.http.put<{ auth_app: AuthApp }>(`/api/v1/auth-apps/${appId}`, updates);
-    return res.auth_app;
-  }
-
-  /** Delete an auth app */
-  async deleteApp(appId: string): Promise<void> {
-    await this.http.delete(`/api/v1/auth-apps/${appId}`);
-  }
-
-  /**
-   * Rotate the auth app's JWT signing keys. Every access and refresh
-   * token issued before the rotation stops verifying, so all end users
-   * are signed out.
-   */
-  async rotateKeys(appId: string): Promise<{ message: string }> {
-    return this.http.post(`/api/v1/auth-apps/${appId}/rotate-keys`);
   }
 
   /** Get auth app statistics */

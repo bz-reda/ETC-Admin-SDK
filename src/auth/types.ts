@@ -99,49 +99,6 @@ export interface AuthStats {
   recent_events: AuthEvent[];
 }
 
-/** Options for creating an auth app (POST /auth-apps) */
-export interface CreateAuthAppOptions {
-  /** Display name, 2–50 characters. */
-  name: string;
-  /**
-   * Public app identifier, 3–30 characters and globally unique. Required —
-   * this is the value @ghayma/auth clients are configured with.
-   */
-  app_id: string;
-  project_id: string;
-  team_id?: string;
-  /** Capacity bracket from auth_tiers; blank defaults to the smallest. */
-  auth_tier_slug?: string;
-}
-
-/**
- * Fields an auth app accepts on update (PUT /auth-apps/:id). Anything not
- * listed here is dropped by the backend's whitelist.
- */
-export interface UpdateAuthAppOptions {
-  name?: string;
-  /** Origins allowed to call the auth service for this app. */
-  allowed_origins?: string[];
-  email_verification_required?: boolean;
-  google_oauth_enabled?: boolean;
-  google_client_id?: string;
-  google_client_secret?: string;
-  github_oauth_enabled?: boolean;
-  github_client_id?: string;
-  github_client_secret?: string;
-  /** Capacity bracket from auth_tiers — re-prices the app. */
-  auth_tier_slug?: string;
-  two_fa_enabled?: boolean;
-  sms_enabled?: boolean;
-  /** Requires at least one 2FA method enabled when not "disabled". */
-  two_fa_policy?: TwoFAPolicy;
-  /** Custom reset-page URL; the reset token is appended as ?token=. */
-  reset_url?: string;
-  email_locale?: EmailLocale;
-  jwt_expiry_seconds?: number;
-  refresh_expiry_seconds?: number;
-}
-
 /** Options for listing users */
 export interface ListUsersOptions {
   /** Page number (default: 1) */
