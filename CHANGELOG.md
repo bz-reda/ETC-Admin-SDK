@@ -2,7 +2,9 @@
 
 Releases before 0.6.0 are documented in the git history.
 
-## 1.0.0
+## 1.1.0
+
+First release of the runtime SDK on npm (1.0.0 was never published).
 
 `@ghayma/sdk` is now the runtime SDK an app imports: a **server** entry that
 holds a project API key, and a **client** entry for the browser. Managing
