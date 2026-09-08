@@ -72,25 +72,11 @@ export interface PresignedUrl {
   expires_in: number;
 }
 
-/** Options for creating a bucket */
-export interface CreateBucketOptions {
-  name: string;
-  project_id: string;
-  is_public?: boolean;
-}
-
 /** Result of an object upload */
 export interface UploadResult {
   message: string;
   /** The key the object was stored under. */
   key: string;
-}
-
-/** Result of making a bucket public */
-export interface ExposeResult {
-  message: string;
-  /** Public base URL the bucket's objects are served from. */
-  public_url: string;
 }
 
 /** Upload options */

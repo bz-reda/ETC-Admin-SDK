@@ -87,34 +87,6 @@ export interface DatabaseMetrics {
   extra?: Record<string, unknown>;
 }
 
-/** Database backup */
-export interface DatabaseBackup {
-  id: string;
-  database_id: string;
-  user_id: string;
-  db_type: DatabaseType;
-  db_name: string;
-  status: "pending" | "running" | "completed" | "failed";
-  size_bytes: number;
-  /** Object key of the dump in the backup bucket. */
-  s3_key: string;
-  /** How the backup was started. Backend field is `trigger`, not `type`. */
-  trigger: "manual" | "scheduled";
-  /** Failure reason; present only on failed backups. */
-  error?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-/** Options for creating a database */
-export interface CreateDatabaseOptions {
-  name: string;
-  project_id: string;
-  /** Backend field is `type` with slugs postgres | mongodb. */
-  type: DatabaseType;
-  version?: string;
-}
-
 /** Connection string helpers */
 export interface ConnectionConfig {
   /** Full connection string (e.g., postgresql://user:pass@host:port/db) */

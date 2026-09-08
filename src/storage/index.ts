@@ -1,10 +1,8 @@
-import { HttpClient } from "../client.js";
+import { HttpClient } from "../http.js";
 import type {
   Bucket,
   BucketCredentials,
-  CreateBucketOptions,
   DownloadResult,
-  ExposeResult,
   ListObjectsOptions,
   ListObjectsResult,
   PresignedUrl,
@@ -17,9 +15,7 @@ export type {
   Bucket,
   BucketCredentials,
   BucketStatus,
-  CreateBucketOptions,
   DownloadResult,
-  ExposeResult,
   ListObjectsOptions,
   ListObjectsResult,
   PresignedUrl,
@@ -29,34 +25,33 @@ export type {
 } from "./types.js";
 
 /**
- * Storage client for managing S3-compatible buckets and objects.
+ * Storage — read and write the objects in your app's buckets.
+ *
+ * Upload, download, list and delete objects, mint presigned URLs for the
+ * browser, and read a bucket's S3 credentials. Creating and deleting
+ * buckets, rotating their credentials and switching them public or private
+ * are management: they live in the console and the `ghayma` CLI.
  *
  * @example
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "gh_..." });
+ * const ghayma = new Ghayma();
  *
  * // Upload a file
- * await client.storage.upload("bucket-id", "images/photo.jpg", file);
+ * await ghayma.storage.upload("bucket-id", "images/photo.jpg", file);
  *
  * // List files
- * const { objects } = await client.storage.listObjects("bucket-id", { prefix: "images/" });
+ * const { objects } = await ghayma.storage.listObjects("bucket-id", { prefix: "images/" });
  *
  * // Get download URL
- * const { url } = await client.storage.getDownloadUrl("bucket-id", "images/photo.jpg");
+ * const { url } = await ghayma.storage.getDownloadUrl("bucket-id", "images/photo.jpg");
  * ```
  */
 export class StorageClient {
   constructor(private readonly http: HttpClient) {}
 
   // ── Bucket Operations ──────────────────────────────────────
-
-  /** Create a new storage bucket */
-  async createBucket(options: CreateBucketOptions): Promise<Bucket> {
-    const res = await this.http.post<{ bucket: Bucket }>("/api/v1/storage", options);
-    return res.bucket;
-  }
 
   /** List all buckets */
   async listBuckets(): Promise<Bucket[]> {
@@ -70,38 +65,12 @@ export class StorageClient {
     return res.bucket;
   }
 
-  /** Delete a bucket and all its objects */
-  async deleteBucket(bucketId: string): Promise<void> {
-    await this.http.delete(`/api/v1/storage/${bucketId}`);
-  }
-
   /** Get S3 credentials for direct access */
   async getCredentials(bucketId: string): Promise<BucketCredentials> {
     const res = await this.http.get<{ credentials: BucketCredentials }>(
       `/api/v1/storage/${bucketId}/credentials`
     );
     return res.credentials;
-  }
-
-  /** Rotate bucket credentials (invalidates existing keys) */
-  async rotateCredentials(bucketId: string): Promise<BucketCredentials> {
-    const res = await this.http.post<{ credentials: BucketCredentials }>(
-      `/api/v1/storage/${bucketId}/rotate`
-    );
-    return res.credentials;
-  }
-
-  /**
-   * Make bucket publicly accessible. Returns the public base URL its
-   * objects are served from.
-   */
-  async makePublic(bucketId: string): Promise<ExposeResult> {
-    return this.http.post<ExposeResult>(`/api/v1/storage/${bucketId}/expose`);
-  }
-
-  /** Make bucket private */
-  async makePrivate(bucketId: string): Promise<void> {
-    await this.http.post(`/api/v1/storage/${bucketId}/unexpose`);
   }
 
   // ── Object Operations ──────────────────────────────────────

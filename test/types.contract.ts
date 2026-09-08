@@ -15,7 +15,6 @@ import type {
   Bucket,
   BucketCredentials,
   Database,
-  DatabaseBackup,
   DatabaseMetrics,
 } from "../src/index.js";
 
@@ -127,21 +126,6 @@ export const databaseMetrics: DatabaseMetrics = {
   active_connections: 3,
   max_connections: 25,
   extra: { table_count: 8, total_rows: 1420 },
-};
-
-/** paas-api internal/backups/model.go — Backup */
-export const databaseBackup: DatabaseBackup = {
-  id: "77777777-7777-7777-7777-777777777777",
-  database_id: "66666666-6666-6666-6666-666666666666",
-  user_id: "22222222-2222-2222-2222-222222222222",
-  db_type: "postgres",
-  db_name: "app",
-  status: "pending",
-  size_bytes: 0,
-  s3_key: "backups/my-postgres/2026-07-31.dump",
-  trigger: "manual",
-  created_at: "2026-07-31T10:00:00Z",
-  updated_at: "2026-07-31T10:00:00Z",
 };
 
 /** paas-api internal/storage/model.go — StorageBucket */

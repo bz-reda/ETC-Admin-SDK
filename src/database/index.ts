@@ -1,9 +1,7 @@
-import { HttpClient } from "../client.js";
+import { HttpClient } from "../http.js";
 import type {
   ConnectionConfig,
-  CreateDatabaseOptions,
   Database,
-  DatabaseBackup,
   DatabaseCredentials,
   DatabaseMetrics,
 } from "./types.js";
@@ -11,9 +9,7 @@ import type {
 export type {
   BackupTierSlug,
   ConnectionConfig,
-  CreateDatabaseOptions,
   Database,
-  DatabaseBackup,
   DatabaseCredentials,
   DatabaseEngine,
   DatabaseMetrics,
@@ -22,32 +18,28 @@ export type {
 } from "./types.js";
 
 /**
- * Database client for managing PostgreSQL and MongoDB instances.
+ * Database — connect your app to its managed PostgreSQL or MongoDB.
+ *
+ * Read the databases this key can see, get their credentials and a
+ * ready-to-use connection config, and read live metrics. Creating,
+ * deleting, starting, stopping, exposing and backing up a database are
+ * management: they live in the console and the `ghayma` CLI.
  *
  * @example
  * ```ts
  * import { Ghayma } from "@ghayma/sdk";
  *
- * const client = new Ghayma({ apiToken: "gh_..." });
+ * const ghayma = new Ghayma();
  *
  * // Get connection string for your app
- * const conn = await client.database.getConnection("db-id");
+ * const conn = await ghayma.database.getConnection("db-id");
  * console.log(conn.url); // postgresql://user:pass@host:port/db
  * ```
  */
 export class DatabaseClient {
   constructor(private readonly http: HttpClient) {}
 
-  // ── Database Management ────────────────────────────────────
-
-  /** Create a new database */
-  async create(options: CreateDatabaseOptions): Promise<Database> {
-    const res = await this.http.post<{ database: Database }>(
-      "/api/v1/databases",
-      options,
-    );
-    return res.database;
-  }
+  // ── Databases ──────────────────────────────────────────────
 
   /** List all databases */
   async list(): Promise<Database[]> {
@@ -63,21 +55,6 @@ export class DatabaseClient {
       `/api/v1/databases/${databaseId}`,
     );
     return res.database;
-  }
-
-  /** Delete a database */
-  async delete(databaseId: string): Promise<void> {
-    await this.http.delete(`/api/v1/databases/${databaseId}`);
-  }
-
-  /** Stop a database */
-  async stop(databaseId: string): Promise<void> {
-    await this.http.post(`/api/v1/databases/${databaseId}/stop`);
-  }
-
-  /** Start a stopped database */
-  async start(databaseId: string): Promise<void> {
-    await this.http.post(`/api/v1/databases/${databaseId}/start`);
   }
 
   // ── Credentials & Connection ───────────────────────────────
@@ -126,27 +103,6 @@ export class DatabaseClient {
     };
   }
 
-  /** Rotate database password (invalidates existing connections). */
-  async rotateCredentials(databaseId: string): Promise<DatabaseCredentials> {
-    // The backend rotate returns only { message, new_password }; re-read the
-    // full credentials (the secret now holds the rotated password) so callers
-    // get a complete, ready-to-use object.
-    await this.http.post(`/api/v1/databases/${databaseId}/rotate`);
-    return this.getCredentials(databaseId);
-  }
-
-  // ── External Access ────────────────────────────────────────
-
-  /** Enable external access (expose via public endpoint) */
-  async expose(databaseId: string): Promise<void> {
-    await this.http.post(`/api/v1/databases/${databaseId}/expose`);
-  }
-
-  /** Disable external access */
-  async unexpose(databaseId: string): Promise<void> {
-    await this.http.post(`/api/v1/databases/${databaseId}/unexpose`);
-  }
-
   // ── Metrics ────────────────────────────────────────────────
 
   /** Get live database metrics (connections, size, performance) */
@@ -155,37 +111,5 @@ export class DatabaseClient {
       `/api/v1/databases/${databaseId}/metrics`,
     );
     return res.metrics;
-  }
-
-  // ── Backups ────────────────────────────────────────────────
-
-  /** Create a manual backup */
-  async createBackup(databaseId: string): Promise<DatabaseBackup> {
-    // The backup object comes back at the top level, not under a wrapper key.
-    return this.http.post<DatabaseBackup>(
-      `/api/v1/databases/${databaseId}/backups`,
-    );
-  }
-
-  /** List backups for a database */
-  async listBackups(databaseId: string): Promise<DatabaseBackup[]> {
-    const res = await this.http.get<{ backups: DatabaseBackup[] }>(
-      `/api/v1/databases/${databaseId}/backups`,
-    );
-    return res.backups || [];
-  }
-
-  /** Restore from a backup */
-  async restoreBackup(databaseId: string, backupId: string): Promise<void> {
-    await this.http.post(
-      `/api/v1/databases/${databaseId}/backups/${backupId}/restore`,
-    );
-  }
-
-  /** Delete a backup */
-  async deleteBackup(databaseId: string, backupId: string): Promise<void> {
-    await this.http.delete(
-      `/api/v1/databases/${databaseId}/backups/${backupId}`,
-    );
   }
 }

@@ -6,8 +6,10 @@
  */
 
 export interface ClientConfig {
-  /** API token from dash.ghayma.cloud/settings (API Tokens tab) */
-  apiToken: string;
+  /** Project API key (`gsk_…`) from Project → Settings → API keys. Defaults to GHAYMA_API_KEY. */
+  apiKey?: string;
+  /** @deprecated account token (`gh_…`). Acts as you across every project; use a project API key. */
+  apiToken?: string;
   /** Base URL override (default: https://api.ghayma.tech) */
   baseUrl?: string;
   /** Request timeout in ms (default: 30000) */
@@ -15,6 +17,18 @@ export interface ClientConfig {
   /** Max retries on 5xx errors (default: 2) */
   maxRetries?: number;
 }
+
+/** Reads process.env where it exists (Node, Bun, Deno); undefined in a browser. */
+function readEnv(name: string): string | undefined {
+  try {
+    return (globalThis as any).process?.env?.[name];
+  } catch {
+    return undefined;
+  }
+}
+
+/** An account token warns on the first client that uses one, not on every one. */
+let accountTokenWarned = false;
 
 export class GhaymaError extends Error {
   public readonly status: number;
@@ -41,22 +55,29 @@ interface ErrorResponse {
 
 export class HttpClient {
   private readonly baseUrl: string;
-  private readonly apiToken: string;
+  private readonly credential: string;
   private readonly timeout: number;
   private readonly maxRetries: number;
 
-  constructor(config: ClientConfig) {
-    if (!config.apiToken) {
-      throw new Error("@ghayma/sdk: apiToken is required. Get one at https://dash.ghayma.cloud/settings (API Tokens tab)");
+  constructor(config: ClientConfig = {}) {
+    // A hosted app sets GHAYMA_API_KEY in its environment, so `new Ghayma()` works
+    // there with no arguments; the deprecated account token still resolves.
+    const credential = config.apiKey || config.apiToken || readEnv("GHAYMA_API_KEY") || "";
+    if (!credential) {
+      throw new Error(
+        "@ghayma/sdk: no credential. Create a project API key in the console (Project → Settings → API keys) and pass it as apiKey or set GHAYMA_API_KEY."
+      );
     }
-    this.apiToken = config.apiToken;
-    let envUrl: string | undefined;
+    if ((credential.startsWith("gh_") || credential.startsWith("et_")) && !accountTokenWarned) {
+      accountTokenWarned = true;
+      console.warn(
+        "@ghayma/sdk: you are using an account token. It acts as you across every project; switch to a project API key (gsk_…) from Project → Settings → API keys."
+      );
+    }
+    this.credential = credential;
     // Dual-read: prefer GHAYMA_API_URL, fall back to legacy ESPACE_API_URL
     // so existing deployments setting the old var keep working post-rebrand.
-    try {
-      const env = (globalThis as any).process?.env;
-      envUrl = env?.GHAYMA_API_URL ?? env?.ESPACE_API_URL;
-    } catch { /* browser */ }
+    const envUrl = readEnv("GHAYMA_API_URL") ?? readEnv("ESPACE_API_URL");
     this.baseUrl = (config.baseUrl || envUrl || "https://api.ghayma.tech").replace(/\/$/, "");
     this.timeout = config.timeout ?? 30_000;
     this.maxRetries = config.maxRetries ?? 2;
@@ -83,7 +104,7 @@ export class HttpClient {
     }
 
     const headers: Record<string, string> = {
-      Authorization: `Bearer ${this.apiToken}`,
+      Authorization: `Bearer ${this.credential}`,
     };
 
     let body: BodyInit | undefined;
@@ -196,7 +217,7 @@ export class HttpClient {
     const timer = setTimeout(() => controller.abort(), timeout);
 
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${this.apiToken}` },
+      headers: { Authorization: `Bearer ${this.credential}` },
       signal: controller.signal,
     });
 
