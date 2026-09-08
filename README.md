@@ -87,7 +87,7 @@ Account tokens remain the CLI's credential; for an app, use a project API key.
 
 ## Migrating from 0.x
 
-Everything that creates, destroys or reconfigures infrastructure left the SDK in 1.0.0. Each removed method has a home in the console or the CLI:
+Everything that creates, destroys or reconfigures infrastructure left the SDK in 1.1.0. Each removed method has a home in the console or the CLI:
 
 | Removed | Where it lives now |
 |---|---|
