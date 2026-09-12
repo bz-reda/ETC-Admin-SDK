@@ -367,16 +367,59 @@ export class GhaymaAuth {
 
   // ==================== OAuth ====================
 
+  /** Provider sign-in URL. With `codeChallenge` the callback returns a one-time `?code=` instead of tokens. */
+  getOAuthUrl(provider: OAuthProvider, params: OAuthRedirectParams): string {
+    // encodeURIComponent rather than URLSearchParams: form encoding would
+    // change the bytes of redirect URIs holding `~`, `!`, `(`, `)` or a space.
+    const redirectUri = encodeURIComponent(params.redirectUri);
+    let url = `${this.baseUrl}/v1/${this.appSlug}/auth/${provider}?redirect_uri=${redirectUri}`;
+    if (params.codeChallenge) {
+      url += `&code_challenge=${encodeURIComponent(params.codeChallenge)}&code_challenge_method=S256`;
+    }
+    return url;
+  }
+
   /** Get the Google OAuth redirect URL */
   getGoogleAuthUrl(params: OAuthRedirectParams): string {
-    const redirectUri = encodeURIComponent(params.redirectUri);
-    return `${this.baseUrl}/v1/${this.appSlug}/auth/google?redirect_uri=${redirectUri}`;
+    return this.getOAuthUrl("google", params);
   }
 
   /** Get the GitHub OAuth redirect URL */
   getGitHubAuthUrl(params: OAuthRedirectParams): string {
-    const redirectUri = encodeURIComponent(params.redirectUri);
-    return `${this.baseUrl}/v1/${this.appSlug}/auth/github?redirect_uri=${redirectUri}`;
+    return this.getOAuthUrl("github", params);
+  }
+
+  /**
+   * Trade the one-time code from a PKCE redirect for a session.
+   *
+   * @param options.clientIp — the end user's IP, forwarded so the service
+   *   rate-limits per end user instead of per calling server. Needs a
+   *   `serverKey`; without one it is ignored and nothing extra is sent.
+   */
+  async exchangeCodeForSession(params: ExchangeCodeParams, options?: RequestOptions): Promise<Session> {
+    const data = await this.http.post<Session>(
+      "/oauth/exchange",
+      { code: params.code, code_verifier: params.codeVerifier },
+      false,
+      options
+    );
+    this.setSession(data, "SIGNED_IN");
+    return data;
+  }
+
+  /**
+   * Sign in with a provider ID token obtained natively (Google Sign-In SDK).
+   *
+   * @param options.clientIp — the end user's IP, forwarded so the service
+   *   rate-limits per end user instead of per calling server. Needs a
+   *   `serverKey`; without one it is ignored and nothing extra is sent.
+   */
+  async signInWithIdToken(params: IdTokenParams, options?: RequestOptions): Promise<Session> {
+    const body: Record<string, string> = { provider: params.provider, id_token: params.idToken };
+    if (params.nonce) body.nonce = params.nonce;
+    const data = await this.http.post<Session>("/oauth/id-token", body, false, options);
+    this.setSession(data, "SIGNED_IN");
+    return data;
   }
 
   /** Handle the OAuth callback by storing the tokens from the URL fragment */
