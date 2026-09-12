@@ -30,6 +30,7 @@ export const authApp: AuthApp = {
   allowed_origins: ["https://example.com"],
   email_verification_required: false,
   google_oauth_enabled: true,
+  google_native_client_ids: [],
   github_oauth_enabled: false,
   auth_tier_slug: "1k",
   two_fa_enabled: false,
