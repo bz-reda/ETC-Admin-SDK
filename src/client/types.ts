@@ -146,14 +146,37 @@ export interface DeleteAccountParams {
   password?: string;
 }
 
+export type OAuthProvider = "google" | "github";
+
 export interface OAuthRedirectParams {
   redirectUri: string;
+  /** S256 challenge from `generatePkce()`; switches the callback to `?code=`. */
+  codeChallenge?: string;
 }
 
 export interface OAuthCallbackParams {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
+}
+
+export type OAuthFlow = "implicit" | "pkce";
+
+export interface SignInWithOAuthParams {
+  redirectUri: string;
+  /** `implicit` (default, tokens in the URL fragment) or `pkce` (one-time code, recommended). */
+  flow?: OAuthFlow;
+}
+
+export interface ExchangeCodeParams {
+  code: string;
+  codeVerifier: string;
+}
+
+export interface IdTokenParams {
+  provider: "google";
+  idToken: string;
+  nonce?: string;
 }
 
 // ==================== Events ====================
@@ -166,6 +189,12 @@ export type AuthStateListener = (event: AuthEvent, session: Session | null) => v
 
 export class AuthError extends Error {
   public readonly status: number;
+  /**
+   * The service's error code — `invalid_credentials`, `rate_limited`,
+   * `invalid_request`, `invalid_grant` (expired or replayed one-time code),
+   * `invalid_token` (rejected provider ID token) — or `oauth_error` for a
+   * provider error handed back on the redirect. Defaults to `auth_error`.
+   */
   public readonly code: string;
   /**
    * Seconds to wait before retrying, read from the response's `Retry-After`

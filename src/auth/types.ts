@@ -19,6 +19,8 @@ export interface AuthApp {
   email_verification_required: boolean;
   google_oauth_enabled: boolean;
   google_client_id?: string;
+  /** Native client IDs accepted by `POST /oauth/id-token` (iOS/Android/desktop). */
+  google_native_client_ids?: string[];
   github_oauth_enabled: boolean;
   github_client_id?: string;
   /** Capacity bracket from auth_tiers (1k | 10k | 100k | 1m). */
