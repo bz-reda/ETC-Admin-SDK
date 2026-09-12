@@ -2,6 +2,38 @@
 
 Releases before 0.6.0 are documented in the git history.
 
+## 1.2.0
+
+The client entry gains the mobile OAuth flows the auth service already
+speaks: PKCE one-time codes, and native sign-in with a provider ID token.
+
+### Added
+
+- **`generatePkce()` / `pkceChallenge()`** — RFC 7636 verifier and S256
+  challenge, plus `PKCE_STORAGE_KEY`. WebCrypto only, no dependencies.
+- **`getOAuthUrl(provider, params)`** — one builder for both providers.
+  `getGoogleAuthUrl` and `getGitHubAuthUrl` now accept an optional
+  `codeChallenge`, which switches the callback from a token fragment to a
+  one-time `?code=`.
+- **`signInWithOAuth(provider, { redirectUri, flow })`** — starts the
+  redirect from the browser; `flow: "pkce"` parks the verifier in
+  `sessionStorage` for the callback page.
+- **`handleOAuthRedirect()`** — finishes the callback whichever way the
+  provider came back: `?code=`, `?error=`, or the token fragment. Scrubs the
+  spent code out of the address bar.
+- **`exchangeCodeForSession({ code, codeVerifier })`** and
+  **`signInWithIdToken({ provider, idToken, nonce })`** — the two new auth
+  service endpoints, both taking `clientIp` like the other rate-limited calls.
+- **`AuthApp.google_native_client_ids`** — the native client IDs the service
+  accepts on `POST /oauth/id-token`.
+
+### Notes
+
+- Nothing changes for existing code: the default flow stays implicit,
+  `handleOAuthFragment()` is untouched, and an OAuth URL built without a
+  `codeChallenge` is byte-for-byte the one 1.1.0 produced.
+- PKCE needs WebCrypto — a browser, or Node 19+.
+
 ## 1.1.0
 
 First release of the runtime SDK on npm (1.0.0 was never published).

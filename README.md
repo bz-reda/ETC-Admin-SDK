@@ -54,6 +54,25 @@ const me = await auth.getUser();
 await auth.logout();
 ```
 
+### OAuth in the browser and on mobile
+
+```ts
+// Recommended: one-time code (PKCE). Tokens never appear in the URL.
+await auth.signInWithOAuth("google", { redirectUri: "https://myapp.com/auth/callback", flow: "pkce" });
+
+// On the callback page — handles ?code= (PKCE) and the legacy #access_token= fragment
+if (await auth.handleOAuthRedirect()) {
+  const me = await auth.getUser();
+}
+
+// Native sign-in (React Native, Capacitor): post the Google ID token the device obtained
+await auth.signInWithIdToken({ provider: "google", idToken });
+```
+
+A mobile deep link (`com.example.app://callback`) works the same way, as long as that exact URL is listed in the app's **Allowed Origins**. On a server, where there is no browser to redirect, drive the flow yourself with `generatePkce()`, `getOAuthUrl()` and `exchangeCodeForSession()`.
+
+The full walkthrough is in [OAuth on mobile](https://docs.ghayma.cloud/guides/oauth-mobile).
+
 ## What each entry can do
 
 **`@ghayma/sdk` (server)**
@@ -68,7 +87,7 @@ await auth.logout();
 - **Two-factor** — `verify2FA`, `enrollTotp`, `confirmTotp`, `disable2FA`, `regenerateRecoveryCodes`
 - **Profile** — `getUser`, `updateUser`, `changePassword`, `changeEmail`, `cancelEmailChange`, `deleteAccount`
 - **Passwords and email** — `forgotPassword`, `resetPassword`, `verifyResetToken`, `resendVerification`
-- **OAuth** — `getGoogleAuthUrl`, `getGitHubAuthUrl`, `handleOAuthCallback`, `handleOAuthFragment`
+- **OAuth** — `signInWithOAuth`, `handleOAuthRedirect`, `getOAuthUrl`, `getGoogleAuthUrl`, `getGitHubAuthUrl`, `exchangeCodeForSession`, `signInWithIdToken`, `generatePkce`, `handleOAuthCallback`, `handleOAuthFragment`
 
 The project API key is a secret and **never ships to a browser**: the client entry authenticates with your app slug alone, so the key stays on your server where you created the `Ghayma` client.
 
