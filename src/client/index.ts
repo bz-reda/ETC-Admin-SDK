@@ -1,5 +1,7 @@
 import { HttpClient } from "./client.js";
+import { PKCE_STORAGE_KEY, generatePkce, pkceChallenge } from "./pkce.js";
 import { TokenManager } from "./token.js";
+import { AuthError } from "./types.js";
 import type {
   AuthConfig,
   AuthEvent,
@@ -29,8 +31,7 @@ import type {
   User,
 } from "./types.js";
 
-export { AuthError } from "./types.js";
-export { PKCE_STORAGE_KEY, generatePkce, pkceChallenge } from "./pkce.js";
+export { AuthError, PKCE_STORAGE_KEY, generatePkce, pkceChallenge };
 export type { PkcePair } from "./pkce.js";
 export type {
   AuthConfig,
@@ -390,6 +391,35 @@ export class GhaymaAuth {
   }
 
   /**
+   * Start a provider sign-in from the browser by navigating to the provider.
+   *
+   * The default `implicit` flow brings the tokens back in the URL fragment;
+   * `pkce` brings back a one-time code instead, parking the verifier in
+   * `sessionStorage` until `handleOAuthRedirect()` picks it up. Resolves to
+   * the URL it navigated to. Server code should use `getOAuthUrl` instead.
+   */
+  async signInWithOAuth(provider: OAuthProvider, params: SignInWithOAuthParams): Promise<string> {
+    if (typeof globalThis.location === "undefined") {
+      throw new Error("signInWithOAuth needs a browser; use getOAuthUrl on the server");
+    }
+
+    const redirect: OAuthRedirectParams = { redirectUri: params.redirectUri };
+
+    if (params.flow === "pkce") {
+      if (typeof globalThis.sessionStorage === "undefined") {
+        throw new Error("the pkce flow needs sessionStorage to hold the verifier across the redirect");
+      }
+      const { codeVerifier, codeChallenge } = await generatePkce();
+      globalThis.sessionStorage.setItem(PKCE_STORAGE_KEY, codeVerifier);
+      redirect.codeChallenge = codeChallenge;
+    }
+
+    const url = this.getOAuthUrl(provider, redirect);
+    globalThis.location.assign(url);
+    return url;
+  }
+
+  /**
    * Trade the one-time code from a PKCE redirect for a session.
    *
    * @param options.clientIp — the end user's IP, forwarded so the service
@@ -461,6 +491,44 @@ export class GhaymaAuth {
     // Clean up the URL fragment
     if (typeof globalThis.history !== "undefined") {
       globalThis.history.replaceState(null, "", globalThis.location.pathname + globalThis.location.search);
+    }
+
+    return true;
+  }
+
+  /**
+   * Finish a sign-in on your callback page, whichever way the provider came
+   * back: a PKCE `?code=`, a provider `?error=`, or the implicit
+   * `#access_token=` fragment. Returns true when a session was stored.
+   *
+   * @throws {AuthError} 400 `oauth_error` — the provider refused
+   * @throws {AuthError} 400 `invalid_grant` — no verifier for this redirect,
+   *   or a code the service has already spent
+   */
+  async handleOAuthRedirect(): Promise<boolean> {
+    if (typeof globalThis.location === "undefined") return false;
+
+    const query = new URLSearchParams(globalThis.location.search);
+
+    const error = query.get("error");
+    if (error) throw new AuthError(error, 400, "oauth_error");
+
+    const code = query.get("code");
+    if (!code) return this.handleOAuthFragment();
+
+    const codeVerifier = globalThis.sessionStorage?.getItem(PKCE_STORAGE_KEY);
+    if (!codeVerifier) {
+      throw new AuthError("missing PKCE verifier for this redirect", 400, "invalid_grant");
+    }
+
+    await this.exchangeCodeForSession({ code, codeVerifier });
+    globalThis.sessionStorage.removeItem(PKCE_STORAGE_KEY);
+
+    // Drop the spent code from the address bar, keeping the rest of the query
+    if (typeof globalThis.history !== "undefined") {
+      query.delete("code");
+      const search = query.toString();
+      globalThis.history.replaceState(null, "", globalThis.location.pathname + (search ? `?${search}` : ""));
     }
 
     return true;
