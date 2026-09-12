@@ -25,6 +25,8 @@ import type {
 } from "./types.js";
 
 export { AuthError } from "./types.js";
+export { PKCE_STORAGE_KEY, generatePkce, pkceChallenge } from "./pkce.js";
+export type { PkcePair } from "./pkce.js";
 export type {
   AuthConfig,
   AuthEvent,
